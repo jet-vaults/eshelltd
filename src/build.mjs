@@ -209,7 +209,7 @@ function field(lang, { id, name, label, type = "text", required = false, full = 
 function form(lang, { kind, subject, to = company.email, fields, cls = "" }) {
   const u = ui[lang], f = u.form;
   const msgs = { required: f.required, phone: f.invalidPhone, email: f.invalidEmail, sending: f.sending, ok: f.ok, err: f.err, mailto: f.mailto };
-  return `<form class="form ${cls}" data-form="${kind}" data-subject="${esc(subject)}" data-to="${to}" data-msgs='${esc(JSON.stringify(msgs))}' action="mailto:${to}" method="post" enctype="text/plain" novalidate>
+  return `<form class="form ${cls}" data-form="${kind}" data-subject="${esc(subject)}" data-to="${to}" data-msgs='${esc(JSON.stringify(msgs))}' novalidate>
 ${fields.join("\n")}
 <input type="checkbox" name="botcheck" class="sr" tabindex="-1" aria-hidden="true">
 <label class="chk full"><input type="checkbox" required> <span>${f.consent} <a href="${href(lang, routes.privacy)}">${privacy[lang].h1}</a></span></label>
@@ -328,6 +328,7 @@ function projectsHub(lang) {
     <label for="f-city">${u.city}<select id="f-city"><option value="all">${u.allCities}</option>${cityIndex(lang).sort((a, b) => a[1].name.localeCompare(b[1].name, lang)).map(([k, v]) => `<option value="${k}">${esc(v.name)}</option>`).join("")}</select></label>
     <p class="filters__count" data-count data-tpl="${u.results("{n}")}" aria-live="polite">${u.results(projects.length)}</p>
   </div>
+  <h2 class="sr">${c.h1}</h2>
   <div class="grid" data-projects>${order.map((p) => card(lang, p, { showSummary: true })).join("")}</div>
 </div>
 <div style="height:clamp(72px,10vw,136px)"></div>`;

@@ -327,6 +327,8 @@ body.menu-open{overflow:hidden}
 .form__status{font-size:15.5px;padding:14px 16px;border-inline-start:3px solid var(--blue-logo);background:var(--paper)}
 .form__status:empty{display:none}
 .on-dark .fld label,.on-dark .chk{color:#fff}
+.on-dark .fld label small{color:rgba(255,255,255,.82)}
+.on-dark .chk a{color:#fff}
 @media (max-width:640px){.form{grid-template-columns:1fr}}
 
 /* ---------- generic content blocks ---------- */

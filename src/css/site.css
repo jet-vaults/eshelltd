@@ -262,7 +262,7 @@ body.menu-open{overflow:hidden}
 .facts div{display:grid;gap:2px;padding-block:16px;border-block-end:1px solid var(--line)}
 .facts dt{font-size:14px;color:var(--muted)}
 .facts dd{margin:0;font-size:21px;font-weight:500;color:var(--ink);line-height:1.35}
-.facts__note{margin-block-start:18px;padding:14px 16px;background:var(--paper);font-size:15px;color:var(--ink);border-inline-start:3px solid var(--blue-logo)}
+.facts__note{margin-block-start:18px;padding:14px 16px;background:var(--paper);font-size:15px;color:var(--ink);border-block-start:1px solid var(--navy)}
 @media (max-width:900px){.pbody{grid-template-columns:1fr}.facts{position:static}}
 .hl{display:grid;grid-template-columns:repeat(2,1fr);gap:0 clamp(24px,4vw,64px);border-block-start:1px solid var(--line)}
 .hl li{padding:20px 0;border-block-end:1px solid var(--line);font-size:18px;color:var(--ink);display:flex;gap:16px;align-items:baseline}
@@ -323,7 +323,7 @@ body.menu-open{overflow:hidden}
 .fld [aria-invalid=true]{border-color:#b3261e}
 .chk{display:flex;gap:12px;align-items:flex-start;font-size:14.5px;line-height:1.55;color:var(--text)}
 .chk input{inline-size:20px;block-size:20px;flex:none;margin-block-start:2px;accent-color:var(--navy)}
-.form__status{font-size:15.5px;padding:14px 16px;border-inline-start:3px solid var(--blue-logo);background:var(--paper)}
+.form__status{font-size:15.5px;padding:14px 16px;border-block-start:1px solid var(--navy);background:var(--paper);color:var(--ink)}
 .form__status:empty{display:none}
 .on-dark .fld label,.on-dark .chk{color:#fff}
 .on-dark .fld label small{color:rgba(255,255,255,.82)}
@@ -372,7 +372,7 @@ body.menu-open{overflow:hidden}
 .prose li{padding-inline-start:22px;position:relative}
 .prose li::before{content:"";position:absolute;inset-inline-start:0;top:.75em;inline-size:10px;block-size:2px;background:var(--blue-logo)}
 .prose a{color:var(--blue)}
-.note{font-size:14.5px;color:var(--muted);border-inline-start:3px solid var(--line);padding-inline-start:14px;margin-block:0 32px}
+.note{font-size:14.5px;color:var(--muted);border-block-start:1px solid var(--line);padding-block-start:14px;margin-block:0 32px;max-inline-size:70ch}
 .press li{display:grid;grid-template-columns:150px 1fr auto;gap:24px;align-items:baseline;padding-block:22px;border-block-end:1px solid var(--line)}
 .press li:first-child{border-block-start:1px solid var(--line)}
 .press time{font-size:14.5px;color:var(--muted)}

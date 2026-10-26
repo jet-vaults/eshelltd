@@ -306,19 +306,38 @@ function contactBand(lang, title, text) {
   const u = ui[lang];
   return `<section class="sec sec--navy on-dark" aria-labelledby="cb-h">
   <div class="wrap cband">
-    <div>${layers}<h2 class="h-m" id="cb-h">${title}</h2><a class="cband__phone num" href="tel:${company.phone}" dir="ltr">${company.phone}</a>
+    <div><h2 class="h-m" id="cb-h">${title}</h2><a class="cband__phone num" href="tel:${company.phone}" dir="ltr">${company.phone}</a>
       <div class="cband__meta"><a href="mailto:${company.email}">${company.email}</a><span>${company.address[lang]}</span></div></div>
     <div class="cband__cta"><a class="btn btn--light" href="${href(lang, routes.contact)}">${u.nav.contact}${ARROW}</a><a class="btn btn--ghost-light" href="${href(lang, routes.residents)}">${u.residents}</a></div>
   </div>
 </section>`;
 }
 
+// Inner-page hero: the architecture leads every page, like the home page.
+function pageHero(lang, { img, title, lead = "", trail, size = "l", caption = "", preloadSizes = "100vw" }) {
+  const cr = crumbs(lang, trail);
+  const t = Array.isArray(title) ? title.map((l) => `<span>${l}</span>`).join("") : title;
+  return {
+    ld: cr.ld,
+    preload: img ? preloadImg(img, preloadSizes) : "",
+    html: `<section class="ihero ihero--${size}${img ? "" : " ihero--plain"}" aria-labelledby="page-h">
+  ${img ? pic(img, { alt: caption, sizes: preloadSizes, cls: "ihero__img", eager: true }) : ""}
+  <div class="wrap ihero__in">
+    ${cr.html.replace('class="crumbs"', 'class="crumbs crumbs--light"')}
+    <h1 class="${size === "s" ? "h-l" : "h-xl"}" id="page-h">${t}</h1>
+    ${lead ? `<p class="ihero__lead">${lead}</p>` : ""}
+  </div>
+  ${img && caption ? `<p class="hero__cap">${esc(caption)}</p>` : ""}
+</section>`,
+  };
+}
+
 function projectsHub(lang) {
   const c = pages.projects[lang], u = ui[lang], t = L(lang);
-  const cr = crumbs(lang, [[c.h1, null]]);
+  const hero = pageHero(lang, { img: "kava-tiberias/02", title: c.h1, lead: c.lead, trail: [[c.h1, null]], size: "m", caption: (lang === "he" ? "KAVA, טבריה. " : "KAVA, Tiberias. ") + u.render });
   const order = [...byStatus("marketing"), ...byStatus("planning"), ...byStatus("occupied")];
   const body = `
-<div class="wrap phead">${cr.html}<h1 class="h-l">${c.h1}</h1><p class="lead">${c.lead}</p></div>
+${hero.html}
 <div class="wrap">
   <div class="filters" role="search" aria-label="${u.filterLabel}">
     <div class="seg" role="group" aria-label="${u.filterLabel}">
@@ -329,189 +348,217 @@ function projectsHub(lang) {
     <p class="filters__count" data-count data-tpl="${u.results("{n}")}" aria-live="polite">${u.results(projects.length)}</p>
   </div>
   <h2 class="sr">${c.h1}</h2>
-  <div class="grid" data-projects>${order.map((p) => card(lang, p, { showSummary: true })).join("")}</div>
+  <div class="pgrid" data-projects>${order.map((p, i) => card(lang, p, { showSummary: true, sizes: i % 5 < 2 ? "(max-width:700px) 100vw, 50vw" : "(max-width:700px) 100vw, 33vw" })).join("")}</div>
 </div>
-<div style="height:clamp(72px,10vw,136px)"></div>`;
+<div class="spacer"></div>
+${contactBand(lang, pages.home[lang].contactTitle, "")}`;
   const ld = { "@context": "https://schema.org", "@type": "ItemList", itemListElement: order.map((p, i) => ({ "@type": "ListItem", position: i + 1, url: DOMAIN + href(lang, projPath(p)), name: t(p.name) })) };
-  return layout(lang, { path: routes.projects, nav: "projects", title: c.title, description: c.description, body, ld: [cr.ld, ld], og: "/og/projects.jpg" });
+  return layout(lang, { path: routes.projects, nav: "projects", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld, ld], og: "/og/projects.jpg" });
 }
 
 function projectPage(lang, p) {
   const u = ui[lang], t = L(lang);
   const cr = crumbs(lang, [[pages.projects[lang].h1, href(lang, routes.projects)], [t(p.name), null]]);
-  const hero = p.images[0];
-  const heroSizes = "100vw";
+  const heroImg = p.images[0];
   const alt = (i) => `${t(p.name)}, ${t(p.city)} - ${u.render}${i ? " " + (i + 1) : ""}`;
   const related = [...projects.filter((x) => x.slug !== p.slug && x.status === p.status), ...projects.filter((x) => x.slug !== p.slug && x.status !== p.status)].slice(0, 3);
+  const mapEmbed = "https://maps.google.com/maps?q=" + encodeURIComponent(p.map) + "&t=m&z=14&output=embed&hl=" + lang;
   const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.map);
   const gallery = p.images.slice(1);
+  const tel = p.phone ? p.phone.replace(/[^0-9*+]/g, "") : "";
   const body = `
-<div class="wrap">
-  <div class="ptitle">
-    <div>${cr.html}<span class="badge${p.status === "marketing" ? " badge--marketing" : ""}">${u.statusOne[p.status]}</span>
-      <h1 class="h-l">${esc(t(p.name))}</h1>
-      <p class="ptitle__meta"><span>${esc(t(p.city))}</span><span>${esc(t(p.area))}</span>${p.year ? `<span class="num">${lang === "he" ? "אכלוס" : "Occupied"} ${p.year}</span>` : ""}</p></div>
-    <div class="hero__cta">${p.status !== "occupied" ? `<a class="btn" href="#inquiry">${u.leaveDetails}${ARROW}</a>` : ""}${p.phone ? `<a class="btn btn--line num" href="tel:${p.phone.replace(/[^0-9*+]/g, "")}" dir="ltr">${p.phone}</a>` : ""}</div>
+<section class="ihero ihero--project${heroImg ? "" : " ihero--plain"}" aria-labelledby="page-h">
+  ${heroImg ? pic(heroImg, { alt: alt(0), sizes: "100vw", cls: "ihero__img", eager: true }) : ""}
+  <div class="wrap ihero__in ihero__in--split">
+    <div>
+      ${cr.html.replace('class="crumbs"', 'class="crumbs crumbs--light"')}
+      <p class="ihero__status"><span class="badge badge--light">${u.statusOne[p.status]}</span><span>${esc(t(p.city))}</span>${p.year ? `<span class="num">${p.year}</span>` : ""}</p>
+      <h1 class="h-xl" id="page-h">${esc(t(p.name))}</h1>
+      <p class="ihero__lead">${esc(t(p.tagline))}</p>
+    </div>
+    <div class="ihero__cta">${p.status !== "occupied" ? `<a class="btn btn--light" href="#inquiry">${u.leaveDetails}${ARROW}</a>` : ""}${tel ? `<a class="btn btn--ghost-light num" href="tel:${tel}" dir="ltr">${p.phone}</a>` : ""}</div>
   </div>
-</div>
-${hero ? `<figure class="phero" style="margin:0">${pic(hero, { alt: alt(0), sizes: heroSizes, eager: true })}<figcaption>${u.render}</figcaption></figure>` : `<div class="phero"><div class="card__media card__media--none" style="aspect-ratio:21/7"><span>${esc(t(p.tagline))}</span></div></div>`}
+  ${heroImg ? `<p class="hero__cap">${u.render}</p>` : ""}
+</section>
+
+<section class="figs" aria-label="${u.facts}">
+  <div class="wrap"><dl class="figs__row">${p.facts.map((f) => `<div><dt>${esc(t(f.label))}</dt><dd class="num${t(f.value).length > 9 ? " long" : ""}">${esc(t(f.value))}</dd></div>`).join("")}</dl></div>
+</section>
 
 <section class="sec" aria-labelledby="ov-h">
-  <div class="wrap pbody">
-    <div class="pbody__text"><h2 class="sr" id="ov-h">${u.overview}</h2><p class="pbody__tag">${esc(t(p.tagline))}</p>${t(p.body).map((x) => `<p>${esc(x)}</p>`).join("")}${p.partners ? `<p class="muted">${esc(t(p.partners))}</p>` : ""}</div>
-    <aside class="facts" aria-labelledby="facts-h"><h2 id="facts-h">${u.facts}</h2><dl>${p.facts.map((f) => `<div><dt>${esc(t(f.label))}</dt><dd class="num">${esc(t(f.value))}</dd></div>`).join("")}</dl>${p.note ? `<p class="facts__note">${esc(t(p.note))}</p>` : ""}</aside>
+  <div class="wrap story">
+    <h2 class="story__h h-l" id="ov-h">${esc(t(p.summary))}</h2>
+    <div class="story__body">${t(p.body).map((x) => `<p>${esc(x)}</p>`).join("")}${p.partners ? `<p class="story__partner">${esc(t(p.partners))}</p>` : ""}${p.note ? `<p class="story__note">${esc(t(p.note))}</p>` : ""}</div>
   </div>
 </section>
-${p.highlights ? `<section class="sec sec--tight" style="padding-top:0" aria-labelledby="hl-h"><div class="wrap"><h2 class="h-s" id="hl-h" style="margin-bottom:20px">${u.highlights}</h2><ul class="hl">${t(p.highlights).map((h) => `<li>${esc(h)}</li>`).join("")}</ul></div></section>` : ""}
-${gallery.length ? `<section class="sec sec--paper" aria-labelledby="gal-h"><div class="wrap"><div class="sec__head">${layers}<h2 class="h-m" id="gal-h">${u.gallery}</h2></div>
-  <div class="gal">${gallery.map((k, i) => `<button type="button" data-full="${largest(k)}" data-alt="${esc(alt(i + 1))}" aria-label="${esc(alt(i + 1))}">${pic(k, { alt: "", sizes: i % 5 === 0 ? "(max-width:700px) 100vw, 66vw" : "(max-width:700px) 50vw, 33vw", max: 1920 })}</button>`).join("")}</div></div></section>
+
+${gallery.length ? `<section class="sec sec--tight gal-sec" aria-labelledby="gal-h"><div class="wrap"><h2 class="sr" id="gal-h">${u.gallery}</h2>
+  <div class="gal gal--n${Math.min(gallery.length, 3)}">${gallery.map((k, i) => `<button type="button" class="${i < 3 ? "g-lead" : "g-more"}" data-full="${largest(k)}" data-alt="${esc(alt(i + 1))}" aria-label="${u.gallery}: ${esc(alt(i + 1))}">${pic(k, { alt: "", sizes: i === 0 ? "(max-width:700px) 100vw, 66vw" : "(max-width:700px) 50vw, 33vw", max: 1920 })}</button>`).join("")}</div></div></section>
 <dialog class="lb" id="lb" aria-label="${u.gallery}"><button type="button" class="lb__close" data-lbclose>${u.close}</button><img alt=""><div class="lb__bar"><span class="num" data-lbcount></span><div class="lb__nav"><button type="button" data-lbprev aria-label="${lang === "he" ? "הקודם" : "Previous"}">${lang === "he" ? "→" : "←"}</button><button type="button" data-lbnext aria-label="${lang === "he" ? "הבא" : "Next"}">${lang === "he" ? "←" : "→"}</button></div></div></dialog>` : ""}
-${p.video || p.externalSite ? `<section class="sec" aria-labelledby="vid-h"><div class="wrap"><div class="sec__head sec__head--row"><h2 class="h-m" id="vid-h">${p.video ? u.video : u.externalSite}</h2>${p.externalSite ? `<a class="link" href="${p.externalSite}" target="_blank" rel="noopener">${u.externalSite}${ARROW}</a>` : ""}</div>
-  ${p.video ? `<button type="button" class="vid" data-yt="${p.video}" aria-label="${u.playVideo}: ${esc(t(p.name))}">${pic(p.images[1] || p.images[0], { alt: "", sizes: "100vw", max: 1920 })}<span class="vid__play">${PLAY}</span></button>` : ""}</div></section>` : ""}
-<section class="sec ${p.video || p.externalSite ? "sec--paper" : ""}" aria-labelledby="loc-h">
-  <div class="wrap loc">
-    <div>${layers}<h2 class="h-m" id="loc-h">${u.location}</h2><p class="lead" style="margin-top:16px">${esc(t(p.area))}, ${esc(t(p.city))}</p><p style="margin-top:24px"><a class="link" href="${mapUrl}" target="_blank" rel="noopener">${u.openMap}${ARROW}</a></p></div>
-    <div class="loc__map" aria-hidden="true"><div><div class="loc__city">${esc(t(p.city))}</div><div class="muted">${esc(t(p.area))}</div></div></div>
-  </div>
+
+${p.highlights ? `<section class="sec sec--navy on-dark" aria-labelledby="hl-h"><div class="wrap hlx">
+  <h2 class="h-l" id="hl-h">${u.highlights}</h2>
+  <ul class="hlx__list">${t(p.highlights).map((h) => `<li>${esc(h)}</li>`).join("")}</ul></div></section>` : ""}
+
+${p.video ? `<section class="sec" aria-labelledby="vid-h"><div class="wrap"><div class="sec__head sec__head--row"><h2 class="h-m" id="vid-h">${u.video}</h2>${p.externalSite ? `<a class="link" href="${p.externalSite}" target="_blank" rel="noopener">${u.externalSite}${ARROW}</a>` : ""}</div>
+  <button type="button" class="vid" data-yt="${p.video}" aria-label="${u.playVideo}: ${esc(t(p.name))}">${pic(p.images[1] || p.images[0], { alt: "", sizes: "100vw", max: 1920 })}<span class="vid__play">${PLAY}</span></button></div></section>` : p.externalSite ? `<section class="sec sec--tight"><div class="wrap"><a class="link" href="${p.externalSite}" target="_blank" rel="noopener">${u.externalSite}${ARROW}</a></div></section>` : ""}
+
+<section class="loc2" aria-labelledby="loc-h">
+  <div class="loc2__map"><button type="button" class="mapf" data-map="${esc(mapEmbed)}" data-title="${esc(u.location + ": " + t(p.name))}">${p.images[p.images.length > 2 ? 2 : 0] ? pic(p.images[p.images.length > 2 ? 2 : 0], { alt: "", sizes: "(max-width:900px) 100vw, 60vw", max: 1280 }) : ""}<span class="mapf__btn">${lang === "he" ? "הצגת המפה" : "Show map"}</span></button></div>
+  <div class="loc2__text"><h2 class="h-l" id="loc-h">${esc(t(p.city))}</h2><p class="lead">${esc(t(p.area))}</p><p><a class="link" href="${mapUrl}" target="_blank" rel="noopener">${u.openMap}${ARROW}</a></p></div>
 </section>
+
 <section class="sec sec--navy on-dark" id="inquiry" aria-labelledby="inq-h">
   <div class="wrap inq">
-    <div>${layers}<h2 class="h-m" id="inq-h">${u.interested}</h2><p style="margin-top:16px">${u.interestedText}</p>${p.phone ? `<p style="margin-top:24px">${u.salesLine}: <a class="num" href="tel:${p.phone.replace(/[^0-9*+]/g, "")}" dir="ltr" style="color:#fff">${p.phone}</a></p>` : `<p style="margin-top:24px"><a class="num" href="tel:${company.phone}" dir="ltr" style="color:#fff">${company.phone}</a></p>`}</div>
+    <div><h2 class="h-l" id="inq-h">${u.interested}</h2><p class="lead lead--light" style="margin-top:18px">${u.interestedText}</p>${tel ? `<p class="inq__phone">${u.salesLine}<a class="num" href="tel:${tel}" dir="ltr">${p.phone}</a></p>` : `<p class="inq__phone">${lang === "he" ? "משרד ראשי" : "Head office"}<a class="num" href="tel:${company.phone}" dir="ltr">${company.phone}</a></p>`}</div>
     ${form(lang, { kind: "project", subject: (lang === "he" ? "פנייה מהאתר" : "Website inquiry") + ": " + t(p.name), fields: [...baseFields(lang, "pq"), `<input type="hidden" name="project" value="${esc(t(p.name))}">`, field(lang, { id: "pq-msg", name: "message", label: ui[lang].form.message, type: "textarea", full: true })] })}
   </div>
 </section>
 <section class="sec" aria-labelledby="rel-h">
   <div class="wrap"><div class="sec__head sec__head--row"><h2 class="h-m" id="rel-h">${u.related}</h2><a class="link" href="${href(lang, routes.projects)}">${u.allProjects}${ARROW}</a></div>
-  <div class="grid">${related.map((r) => card(lang, r)).join("")}</div></div>
+  <div class="rel">${related.map((r) => card(lang, r)).join("")}</div></div>
 </section>`;
-  const ld = { "@context": "https://schema.org", "@type": "Place", name: t(p.name), description: t(p.summary), address: { "@type": "PostalAddress", addressLocality: t(p.city), addressCountry: "IL" }, ...(hero ? { image: DOMAIN + largest(hero) } : {}), url: DOMAIN + href(lang, projPath(p)) };
+  const ld = { "@context": "https://schema.org", "@type": "Place", name: t(p.name), description: t(p.summary), address: { "@type": "PostalAddress", addressLocality: t(p.city), addressCountry: "IL" }, ...(heroImg ? { image: DOMAIN + largest(heroImg) } : {}), url: DOMAIN + href(lang, projPath(p)) };
   const title = `${t(p.name)}, ${t(p.city)} | ${company.name[lang]}`;
-  return layout(lang, { path: projPath(p), nav: "projects", title, description: t(p.summary), body, preload: hero ? preloadImg(hero, heroSizes) : "", ld: [cr.ld, ld], og: `/og/${p.slug}.jpg` });
+  return layout(lang, { path: projPath(p), nav: "projects", title, description: t(p.summary), body, preload: heroImg ? preloadImg(heroImg, "100vw") : "", ld: [cr.ld, ld], og: `/og/${p.slug}.jpg` });
 }
+
+const BENEFIT_GROUPS = {
+  he: [["הדירה החדשה", [0, 1, 2, 3, 4]], ["ביטחונות", [5, 6]], ["מימון וליווי", [7, 8, 9, 10]]],
+  en: [["The new home", [0, 1, 2, 3, 4]], ["Guarantees", [5, 6]], ["Costs and support", [7, 8, 9, 10]]],
+};
 
 function renewalPage(lang) {
   const c = pages.renewal[lang], u = ui[lang], t = L(lang);
-  const cr = crumbs(lang, [[u.nav.renewal, null]]);
-  const heroKey = "ur-yokneam/00";
+  const hero = pageHero(lang, { img: "ur-yokneam/01", title: c.h1, lead: c.lead, trail: [[u.nav.renewal, null]], size: "l", caption: t(renewal[0].name) + ". " + u.render });
   const body = `
-<div class="wrap phead">${cr.html}<h1 class="h-l">${c.h1.map((l) => `<span style="display:block">${l}</span>`).join("")}</h1><p class="lead">${c.lead}</p></div>
-<figure class="phero" style="margin:0">${pic(heroKey, { alt: t(renewal[0].name) + " - " + u.render, sizes: "100vw", eager: true })}<figcaption>${esc(t(renewal[0].name))}. ${u.render}</figcaption></figure>
-<section class="sec" aria-labelledby="why-h"><div class="wrap"><div class="sec__head"><h2 class="h-m" id="why-h">${c.whyTitle}</h2></div>
-  <div class="facts-row">${c.why.map((w) => `<div><span class="v num">${w.value}</span><span class="l">${w.label}</span></div>`).join("")}</div></div></section>
-<section class="sec sec--tight" style="padding-top:0" aria-labelledby="prob-h"><div class="wrap cols2"><div>${layers}<h2 class="h-l" id="prob-h">${c.problemTitle}</h2></div><p class="lead">${c.problem}</p></div></section>
-<section class="sec sec--navy on-dark" aria-labelledby="way-h"><div class="wrap"><div class="sec__head">${layers}<h2 class="h-l" id="way-h">${c.wayTitle}</h2></div>
-  <ol class="rows" role="list">${c.way.map((w) => `<li class="rv"><h3>${w.title}</h3><p>${w.text}</p></li>`).join("")}</ol></div></section>
+${hero.html}
+<section class="figs" aria-label="${c.whyTitle}"><div class="wrap"><dl class="figs__row">${c.why.map((w) => `<div><dt>${w.label}</dt><dd class="num">${w.value}</dd></div>`).join("")}</dl></div></section>
+<section class="sec" aria-labelledby="prob-h"><div class="wrap story">
+  <h2 class="story__h h-l" id="prob-h">${c.problemTitle}</h2>
+  <div class="story__body"><p>${c.problem}</p></div></div></section>
+<section class="sec sec--navy on-dark" aria-labelledby="way-h"><div class="wrap">
+  <div class="sec__head">${layers}<h2 class="h-l" id="way-h">${c.wayTitle}</h2></div>
+  <ol class="trio" role="list">${c.way.map((w) => `<li class="rv"><h3>${w.title}</h3><p>${w.text}</p></li>`).join("")}</ol></div></section>
 <section class="sec" aria-labelledby="urp-h"><div class="wrap"><div class="sec__head"><h2 class="h-l" id="urp-h">${c.projectsTitle}</h2></div>
   <div class="ur">${renewal.map((r) => `<article class="ur__item rv" aria-labelledby="ur-${r.id}">
     <div class="ur__media">${r.images.slice(0, 3).map((k, i) => pic(k, { alt: `${t(r.name)} - ${u.render}${i ? " " + (i + 1) : ""}`, sizes: i ? "(max-width:900px) 33vw, 20vw" : "(max-width:900px) 66vw, 40vw", max: 1920 })).join("")}</div>
-    <div><h3 class="h-m" id="ur-${r.id}">${esc(t(r.name))}</h3><p style="margin-top:16px">${esc(t(r.body))}</p><dl>${r.facts.map((f) => `<div><dt>${esc(t(f.label))}</dt><dd class="num">${esc(t(f.value))}</dd></div>`).join("")}</dl></div>
+    <div class="ur__text"><p class="ur__city">${esc(t(r.city))}</p><h3 class="h-m" id="ur-${r.id}">${esc(t(r.name))}</h3><p>${esc(t(r.body))}</p><dl>${r.facts.map((f) => `<div><dt>${esc(t(f.label))}</dt><dd class="num">${esc(t(f.value))}</dd></div>`).join("")}</dl></div>
   </article>`).join("")}</div></div></section>
-<section class="sec sec--paper" aria-labelledby="ben-h"><div class="wrap"><div class="sec__head">${layers}<h2 class="h-l" id="ben-h">${c.benefitsTitle}</h2></div>
-  <ul class="tick">${c.benefits.map((b) => `<li>${b}</li>`).join("")}</ul><p class="note" style="margin-top:28px">${c.benefitsNote}</p></div></section>
+<section class="sec sec--paper" aria-labelledby="ben-h"><div class="wrap">
+  <div class="sec__head"><h2 class="h-l" id="ben-h">${c.benefitsTitle}</h2></div>
+  <div class="bgroups">${BENEFIT_GROUPS[lang].map(([title, idx]) => `<div class="bgroup"><h3>${title}</h3><ul>${idx.map((i) => `<li>${c.benefits[i]}</li>`).join("")}</ul></div>`).join("")}</div>
+  <p class="note" style="margin-top:40px">${c.benefitsNote}</p></div></section>
 <section class="sec sec--navy on-dark" id="contact-ur" aria-labelledby="urf-h"><div class="wrap inq">
-  <div>${layers}<h2 class="h-m" id="urf-h">${c.formTitle}</h2><p style="margin-top:16px">${c.formText}</p><p style="margin-top:24px"><a class="num" href="tel:${company.phone}" dir="ltr" style="color:#fff">${company.phone}</a></p></div>
+  <div><h2 class="h-l" id="urf-h">${c.formTitle}</h2><p class="lead lead--light" style="margin-top:18px">${c.formText}</p><p class="inq__phone">${lang === "he" ? "משרד ראשי" : "Head office"}<a class="num" href="tel:${company.phone}" dir="ltr">${company.phone}</a></p></div>
   ${form(lang, { kind: "renewal", subject: lang === "he" ? "התחדשות עירונית - פנייה מהאתר" : "Urban renewal inquiry", fields: [field(lang, { id: "ur-role", name: "role", label: c.role, options: c.roles, required: true }), field(lang, { id: "ur-addr", name: "address", label: c.address, auto: "street-address" }), ...baseFields(lang, "ur"), field(lang, { id: "ur-msg", name: "message", label: u.form.message, type: "textarea", full: true })] })}
 </div></section>`;
-  return layout(lang, { path: routes.renewal, nav: "renewal", title: c.title, description: c.description, body, preload: preloadImg(heroKey, "100vw"), ld: [cr.ld], og: "/og/urban-renewal.jpg" });
+  return layout(lang, { path: routes.renewal, nav: "renewal", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld], og: "/og/urban-renewal.jpg" });
 }
 
 function aboutPage(lang) {
   const c = pages.about[lang], u = ui[lang], h = pages.home[lang];
-  const cr = crumbs(lang, [[u.nav.about, null]]);
-  const heroKey = "white-neighborhood-karmiel/00";
+  const cap = lang === "he" ? "השכונה הלבנה, כרמיאל" : "The White Neighbourhood, Karmiel";
+  const hero = pageHero(lang, { img: "white-neighborhood-karmiel/00", title: c.h1, lead: c.lead, trail: [[u.nav.about, null]], size: "l", caption: cap });
   const body = `
-<div class="wrap phead">${cr.html}<h1 class="h-xl">${c.h1}</h1><p class="lead" style="margin-top:8px">${c.lead}</p></div>
-<figure class="phero" style="margin:0">${pic(heroKey, { alt: (lang === "he" ? "השכונה הלבנה, כרמיאל" : "The White Neighbourhood, Karmiel"), sizes: "100vw", eager: true })}<figcaption>${lang === "he" ? "השכונה הלבנה, כרמיאל" : "The White Neighbourhood, Karmiel"}</figcaption></figure>
-<section class="sec" aria-label="${c.milestonesTitle}"><div class="wrap cols2"><div class="prose">${c.story.map((p) => `<p class="lead" style="max-width:none">${p}</p>`).join("")}</div>
-  <div><h2 class="h-s" style="margin-bottom:20px">${c.milestonesTitle}</h2><div class="facts" style="position:static"><dl>${c.milestones.map((m) => `<div><dt>${m.label}</dt><dd class="num">${m.value}</dd></div>`).join("")}</dl></div></div></div></section>
+${hero.html}
+<section class="figs" aria-label="${c.milestonesTitle}"><div class="wrap"><dl class="figs__row">${c.milestones.map((m) => `<div><dt>${m.label}</dt><dd class="num${m.value.length > 9 ? " long" : ""}">${m.value}</dd></div>`).join("")}</dl></div></section>
+<section class="sec" aria-label="${u.nav.about}"><div class="wrap story">
+  <p class="story__h h-l">${c.story[0].split(/(?<=\.)\s/)[0]}</p>
+  <div class="story__body"><p>${c.story[0].split(/(?<=\.)\s/).slice(1).join(" ")}</p>${c.story.slice(1).map((p) => `<p>${p}</p>`).join("")}</div></div></section>
 <section class="sec sec--navy on-dark" aria-labelledby="roof-h"><div class="wrap roof">
   <div class="roof__text">${layers}<h2 class="h-l" id="roof-h">${h.roofTitle.map((l) => `<span style="display:block">${l}</span>`).join("")}</h2><p>${h.roofText}</p></div>
   <ol class="stack" role="list">${h.roof.map((r) => `<li class="stack__item"><h3>${r.title}</h3><p>${r.text}</p></li>`).join("")}</ol></div></section>
-<section class="sec" aria-labelledby="val-h"><div class="wrap"><div class="sec__head">${layers}<h2 class="h-l" id="val-h">${c.valuesTitle}</h2></div>
-  <ol class="rows" role="list">${c.values.map((v) => `<li class="rv"><h3>${v.title}</h3><p>${v.text}</p></li>`).join("")}</ol></div></section>
-<section class="sec sec--paper" aria-labelledby="fld-h"><div class="wrap"><div class="sec__head"><h2 class="h-m" id="fld-h">${c.fieldsTitle}</h2></div><ul class="tick">${c.fields.map((f) => `<li>${f}</li>`).join("")}</ul></div></section>
-<section class="sec" aria-labelledby="reg-h"><div class="wrap"><div class="sec__head"><h2 class="h-m" id="reg-h">${c.regionsTitle}</h2></div>
+<section class="sec" aria-labelledby="val-h"><div class="wrap">
+  <div class="sec__head"><h2 class="h-l" id="val-h">${c.valuesTitle}</h2></div>
+  <div class="quad">${c.values.map((v) => `<div class="rv"><h3>${v.title}</h3><p>${v.text}</p></div>`).join("")}</div></div></section>
+<section class="band" aria-labelledby="fld-h">
+  ${pic("rova-alonim-villas/00", { alt: "", sizes: "100vw", cls: "band__img", max: 1920 })}
+  <div class="wrap band__in"><h2 class="h-m" id="fld-h">${c.fieldsTitle}</h2><ul class="band__list">${c.fields.map((f) => `<li>${f}</li>`).join("")}</ul></div>
+</section>
+<section class="sec" aria-labelledby="reg-h"><div class="wrap"><div class="sec__head"><h2 class="h-l" id="reg-h">${c.regionsTitle}</h2></div>
   <div class="cities">${cityIndex(lang).map(([k, v]) => `<a href="${href(lang, routes.projects)}?city=${k}">${esc(v.name)}<span class="num">${v.n}</span></a>`).join("")}</div></div></section>
-<section class="sec sec--tight sec--paper" aria-labelledby="car-h"><div class="wrap sec__head--row sec__head" style="margin:0"><div><h2 class="h-m" id="car-h">${c.ctaTitle}</h2><p class="muted" style="margin-top:10px">${c.ctaText}</p></div><a class="btn" href="${href(lang, routes.careers)}">${u.nav.careers}${ARROW}</a></div></section>`;
-  return layout(lang, { path: routes.about, nav: "about", title: c.title, description: c.description, body, preload: preloadImg(heroKey, "100vw"), ld: [cr.ld], og: "/og/about.jpg" });
+<section class="sec sec--tight sec--paper" aria-labelledby="car-h"><div class="wrap"><div class="sec__head sec__head--row" style="margin:0"><div><h2 class="h-m" id="car-h">${c.ctaTitle}</h2><p class="muted" style="margin-top:10px">${c.ctaText}</p></div><a class="btn" href="${href(lang, routes.careers)}">${u.nav.careers}${ARROW}</a></div></div></section>`;
+  return layout(lang, { path: routes.about, nav: "about", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld], og: "/og/about.jpg" });
 }
 
 function residentsPage(lang) {
   const c = pages.residents[lang], u = ui[lang], t = L(lang);
-  const cr = crumbs(lang, [[u.residents, null]]);
+  const hero = pageHero(lang, { img: "lev-hapisga-karmiel/00", title: c.h1, lead: c.lead, trail: [[u.residents, null]], size: "s", caption: (lang === "he" ? "לב הפסגה, כרמיאל" : "Lev HaPisga, Karmiel") });
   const projOptions = [...byStatus("occupied"), ...byStatus("marketing")].map((p) => `${t(p.name)}, ${t(p.city)}`).concat(lang === "he" ? ["אחר"] : ["Other"]);
   const body = `
-<div class="wrap phead">${cr.html}<h1 class="h-l">${c.h1}</h1><p class="lead">${c.lead}</p></div>
-<section class="sec" style="padding-top:0"><div class="wrap inq">
-  <aside class="side-card" aria-label="${c.phoneTitle}"><h2>${c.phoneTitle}</h2><a class="cband__phone num" style="color:var(--navy)" href="tel:${company.phone}" dir="ltr">${company.phone}</a><p><a href="mailto:${company.email}">${company.email}</a><br>${company.address[lang]}</p><p class="small muted" style="margin-top:12px">${c.note} <a href="${href(lang, routes.contact)}">${u.nav.contact}</a></p></aside>
+${hero.html}
+<section class="sec"><div class="wrap inq inq--light">
+  <aside class="svc" aria-label="${c.phoneTitle}"><h2 class="h-s">${c.phoneTitle}</h2><a class="svc__phone num" href="tel:${company.phone}" dir="ltr">${company.phone}</a><p><a href="mailto:${company.email}">${company.email}</a></p><p>${company.address[lang]}</p><p class="small muted svc__note">${c.note} <a href="${href(lang, routes.contact)}">${u.nav.contact}</a></p></aside>
   ${form(lang, { kind: "residents", subject: lang === "he" ? "פניית דייר" : "Resident inquiry", fields: [field(lang, { id: "rs-project", name: "project", label: u.form.project, options: projOptions, required: true }), field(lang, { id: "rs-type", name: "type", label: u.form.type, options: c.types, required: true }), ...baseFields(lang, "rs"), field(lang, { id: "rs-msg", name: "message", label: u.form.message, type: "textarea", required: true, full: true })] })}
 </div></section>`;
-  return layout(lang, { path: routes.residents, title: c.title, description: c.description, body, ld: [cr.ld] });
+  return layout(lang, { path: routes.residents, title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld] });
 }
 
 function contactPage(lang) {
   const c = pages.contact[lang], u = ui[lang], t = L(lang);
-  const cr = crumbs(lang, [[u.nav.contact, null]]);
+  const hero = pageHero(lang, { img: "neot-navon/07", title: c.h1, lead: c.lead, trail: [[u.nav.contact, null]], size: "s", caption: (lang === "he" ? "נאות נבון, חיפה. " : "Neot Navon, Haifa. ") + u.render });
   const body = `
-<div class="wrap phead">${cr.html}<h1 class="h-l">${c.h1}</h1><p class="lead">${c.lead}</p></div>
-<section class="sec" style="padding-top:0"><div class="wrap inq">
-  <div><h2 class="h-s" style="margin-bottom:24px">${c.office}</h2>
-    <dl class="contact-list">
-      <div><dt>${u.form.phone}</dt><dd><a class="num" href="tel:${company.phone}" dir="ltr">${company.phone}</a></dd></div>
-      <div><dt>${u.form.email}</dt><dd><a href="mailto:${company.email}">${company.email}</a></dd></div>
-      <div><dt>${lang === "he" ? "כתובת" : "Address"}</dt><dd>${company.address[lang]}</dd></div>
-    </dl>
-    <p style="margin-top:24px"><a class="link" href="${company.mapsUrl}" target="_blank" rel="noopener">${u.openMap}${ARROW}</a></p>
-    <div class="side-card" style="margin-top:40px"><h2>${c.residentsBox}</h2><p>${c.residentsText}</p><p><a class="link" href="${href(lang, routes.residents)}">${u.residents}${ARROW}</a></p></div>
+${hero.html}
+<section class="sec"><div class="wrap inq inq--light">
+  <div class="svc">
+    <h2 class="h-s">${c.office}</h2>
+    <a class="svc__phone num" href="tel:${company.phone}" dir="ltr">${company.phone}</a>
+    <p><a href="mailto:${company.email}">${company.email}</a></p>
+    <p>${company.address[lang]}</p>
+    <p><a class="link" href="${company.mapsUrl}" target="_blank" rel="noopener">${u.openMap}${ARROW}</a></p>
+    <div class="svc__res"><h3>${c.residentsBox}</h3><p>${c.residentsText}</p><a class="link" href="${href(lang, routes.residents)}">${u.residents}${ARROW}</a></div>
   </div>
   ${form(lang, { kind: "contact", subject: lang === "he" ? "פנייה מהאתר" : "Website inquiry", fields: [field(lang, { id: "ct-subject", name: "subject", label: c.subject, options: c.subjects, required: true }), field(lang, { id: "ct-project", name: "project", label: u.form.project, options: byStatus("marketing").map((p) => t(p.name)) }), ...baseFields(lang, "ct"), field(lang, { id: "ct-msg", name: "message", label: u.form.message, type: "textarea", full: true })] })}
 </div></section>`;
   const ld = { "@context": "https://schema.org", "@type": "ContactPage", url: DOMAIN + href(lang, routes.contact), name: c.h1 };
-  return layout(lang, { path: routes.contact, nav: "contact", title: c.title, description: c.description, body, ld: [cr.ld, ld] });
+  return layout(lang, { path: routes.contact, nav: "contact", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld, ld] });
 }
 
 function careersPage(lang) {
   const c = pages.careers[lang], u = ui[lang], t = L(lang);
-  const cr = crumbs(lang, [[u.nav.careers, null]]);
+  const hero = pageHero(lang, { img: "elad-center/00", title: c.h1, lead: c.lead, trail: [[u.nav.careers, null]], size: "s", caption: (lang === "he" ? "אלעד סנטר. " : "Elad Center. ") + u.render });
   const body = `
-<div class="wrap phead">${cr.html}<h1 class="h-l">${c.h1}</h1><p class="lead">${c.lead}</p></div>
-<section class="sec" style="padding-top:0"><div class="wrap"><div class="jobs">${jobs.map((j, i) => `<details${i === 0 ? " open" : ""}><summary><div><span class="code num">${j.code}</span><h2>${esc(t(j.title))}</h2></div></summary>
+${hero.html}
+<section class="sec"><div class="wrap"><div class="jobs">${jobs.map((j, i) => `<details${i === 0 ? " open" : ""}><summary><div><span class="code num">${j.code}</span><h2>${esc(t(j.title))}</h2></div></summary>
   <div class="jobs__in"><p>${esc(t(j.intro))}</p><div><h3>${c.role}</h3><ul>${t(j.duties).map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div><div><h3>${c.req}</h3><ul>${t(j.reqs).map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
   <p class="muted small">${c.equal}</p><p><a class="btn" href="mailto:${company.hrEmail}?subject=${encodeURIComponent(j.code + " " + t(j.title))}">${c.apply}${ARROW}</a></p></div></details>`).join("")}</div>
   <p class="lead" style="margin-top:48px">${c.general}<a href="mailto:${company.hrEmail}">${company.hrEmail}</a></p></div></section>`;
   const ld = jobs.map((j) => ({ "@context": "https://schema.org", "@type": "JobPosting", title: t(j.title), description: t(j.intro), hiringOrganization: { "@type": "Organization", name: company.legalName[lang], sameAs: DOMAIN }, employmentType: "FULL_TIME", datePosted: "2026-08-13", jobLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressCountry: "IL", addressRegion: lang === "he" ? "צפון" : "North" } } }));
-  return layout(lang, { path: routes.careers, nav: "careers", title: c.title, description: c.description, body, ld: [cr.ld, ...ld] });
+  return layout(lang, { path: routes.careers, nav: "careers", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld, ...ld] });
 }
 
 function pressPage(lang) {
   const c = pages.press[lang], u = ui[lang], t = L(lang);
-  const cr = crumbs(lang, [[u.nav.press, null]]);
+  const hero = pageHero(lang, { img: "neot-navon/00", title: c.h1, lead: c.lead, trail: [[u.nav.press, null]], size: "s", caption: (lang === "he" ? "נאות נבון, חיפה. " : "Neot Navon, Haifa. ") + u.render });
+  const [lead, ...rest] = press;
+  const linkFor = (x) => x.url ? `<a class="link" href="${x.url}"${x.url.startsWith("http") ? ' target="_blank" rel="noopener"' : ""} hreflang="he">${x.pdf ? c.pdf : c.read}${ARROW}</a>` : x.project ? `<a class="link" href="${href(lang, routes.projects + x.project + "/")}">${u.toProject}${ARROW}</a>` : "";
   const body = `
-<div class="wrap phead">${cr.html}<h1 class="h-l">${c.h1}</h1><p class="lead">${c.lead}</p></div>
-<section class="sec" style="padding-top:0"><div class="wrap"><ul class="press">${press.map((x) => {
-    const link = x.url ? `<a class="link" href="${x.url}"${x.url.startsWith("http") ? ' target="_blank" rel="noopener"' : ""} hreflang="he">${x.pdf ? c.pdf : c.read}${ARROW}</a>` : x.project ? `<a class="link" href="${href(lang, routes.projects + x.project + "/")}">${u.toProject}${ARROW}</a>` : "<span></span>";
-    return `<li><time>${t(x.date)}</time><h2 lang="he" dir="rtl">${esc(x.title)}${x.source ? ` <span class="muted" style="font-weight:400">(${esc(x.source)})</span>` : ""}</h2>${link}</li>`;
-  }).join("")}</ul></div></section>`;
-  return layout(lang, { path: routes.press, nav: "press", title: c.title, description: c.description, body, ld: [cr.ld] });
+${hero.html}
+<section class="sec"><div class="wrap">
+  <ul class="press">${press.map((x) => `<li><time>${t(x.date)}</time><h2 lang="he" dir="rtl">${esc(x.title)}${x.source ? ` <span class="muted" style="font-weight:400">(${esc(x.source)})</span>` : ""}</h2>${linkFor(x) || "<span></span>"}</li>`).join("")}</ul></div></section>`;
+  return layout(lang, { path: routes.press, nav: "press", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld] });
 }
 
 function proseBlocks(blocks) {
   return blocks.map(([k, v]) => (k === "h" ? `<h2>${esc(v)}</h2>` : k === "ul" ? `<ul>${v.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p>${esc(v)}</p>`)).join("\n");
 }
 function legalDoc(lang, doc, path) {
-  const d = doc[lang], cr = crumbs(lang, [[d.h1, null]]);
-  const body = `<div class="wrap phead">${cr.html}<h1 class="h-l">${d.h1}</h1></div><section class="sec" style="padding-top:0"><div class="wrap prose">${d.note ? `<p class="note">${d.note}</p>` : ""}${proseBlocks(d.blocks)}<p class="muted" style="margin-top:40px">${d.updated}</p></div></section>`;
-  return layout(lang, { path, title: d.title, description: d.description, body, ld: [cr.ld] });
+  const d = doc[lang];
+  const hero = pageHero(lang, { title: d.h1, trail: [[d.h1, null]], size: "s" });
+  const body = `${hero.html}<section class="sec"><div class="wrap prose">${d.note ? `<p class="note">${d.note}</p>` : ""}${proseBlocks(d.blocks)}<p class="muted" style="margin-top:40px">${d.updated}</p></div></section>`;
+  return layout(lang, { path, title: d.title, description: d.description, body, ld: [hero.ld] });
 }
 function legalPage(lang) {
-  const c = pages.legal[lang], u = ui[lang], cr = crumbs(lang, [[c.h1, null]]);
-  const body = `<div class="wrap phead">${cr.html}<h1 class="h-l">${c.h1}</h1></div>
-<section class="sec" style="padding-top:0"><div class="wrap"><ul class="press">
+  const c = pages.legal[lang];
+  const hero = pageHero(lang, { title: c.h1, trail: [[c.h1, null]], size: "s" });
+  const body = `${hero.html}
+<section class="sec"><div class="wrap"><ul class="press">
   <li><time>${c.equalPayDate}</time><h2>${c.equalPay}</h2><a class="link" href="/files/equal-pay-report-2026.pdf" hreflang="he">${c.open}${ARROW}</a></li>
   <li><time></time><h2>${privacy[lang].h1}</h2><a class="link" href="${href(lang, routes.privacy)}">${privacy[lang].h1}${ARROW}</a></li>
   <li><time></time><h2>${accessibility[lang].h1}</h2><a class="link" href="${href(lang, routes.accessibility)}">${accessibility[lang].h1}${ARROW}</a></li>
 </ul></div></section>`;
-  return layout(lang, { path: routes.legal, title: c.title, description: c.description, body, ld: [cr.ld] });
+  return layout(lang, { path: routes.legal, title: c.title, description: c.description, body, ld: [hero.ld] });
 }
 
 function notFound() {

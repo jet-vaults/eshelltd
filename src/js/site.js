@@ -90,6 +90,16 @@
     }, { once: true });
   });
 
+  /* ---------- map: load Google Maps only on click ---------- */
+  $$("[data-map]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var f = d.createElement("iframe");
+      f.src = b.dataset.map; f.title = b.dataset.title || "map"; f.loading = "lazy";
+      f.referrerPolicy = "no-referrer-when-downgrade";
+      b.replaceWith(f);
+    }, { once: true });
+  });
+
   /* ---------- forms ---------- */
   var cfg = window.EH_FORMS || {};
   $$("form[data-form]").forEach(function (form) {

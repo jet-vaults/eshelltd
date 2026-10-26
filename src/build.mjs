@@ -187,12 +187,15 @@ const crumbs = (lang, trail) => {
 const layers = `<span class="layers" aria-hidden="true"><i></i><i></i><i></i></span>`;
 
 // ---------------------------------------------------------------- components
+const PIN = `<svg class="ico" viewBox="0 0 256 256" aria-hidden="true"><path fill="currentColor" d="M128,64a40,40,0,1,0,40,40A40,40,0,0,0,128,64Zm0,64a24,24,0,1,1,24-24A24,24,0,0,1,128,128Zm0-112a88.1,88.1,0,0,0-88,88c0,31.4,14.51,64.68,42,96.25a254.19,254.19,0,0,0,41.45,38.3,8,8,0,0,0,9.18,0A254.19,254.19,0,0,0,174,200.25c27.45-31.57,42-64.85,42-96.25A88.1,88.1,0,0,0,128,16Zm0,206c-16.53-13-72-60.75-72-118a72,72,0,0,1,144,0C200,161.23,144.53,209,128,222Z"/></svg>`;
 function card(lang, p, { sizes = "(max-width:640px) 100vw, (max-width:1000px) 50vw, 33vw", showSummary = false } = {}) {
   const t = L(lang), u = ui[lang];
+  const chip = `<span class="chip chip--${p.status}">${u.statusOne[p.status]}</span>`;
   const media = p.images.length
-    ? `<div class="card__media">${pic(p.images[0], { alt: `${t(p.name)}, ${t(p.city)} - ${u.render}`, sizes, max: 1280 })}</div>`
-    : `<div class="card__media card__media--none"><span>${esc(t(p.name))}</span></div>`;
-  return `<a class="card" href="${href(lang, projPath(p))}" data-st="${p.status}" data-city="${citySlug(p)}">${media}<div class="card__body"><h3 class="card__name">${esc(t(p.name))}</h3><p class="card__meta"><span>${esc(t(p.city))}</span><span class="st">${u.statusOne[p.status]}</span></p>${showSummary ? `<p class="card__sum">${esc(t(p.summary))}</p>` : ""}</div></a>`;
+    ? `<div class="card__media">${pic(p.images[0], { alt: `${t(p.name)}, ${t(p.city)} - ${u.render}`, sizes, max: 1280 })}${chip}</div>`
+    : `<div class="card__media card__media--none"><span>${esc(t(p.name))}</span>${chip}</div>`;
+  const facts = p.facts.slice(0, 2).map((f) => `<div><dt>${esc(t(f.label))}</dt><dd class="num">${esc(t(f.value))}</dd></div>`).join("");
+  return `<a class="card" href="${href(lang, projPath(p))}" data-st="${p.status}" data-city="${citySlug(p)}">${media}<div class="card__body"><div class="card__top"><h3 class="card__name">${esc(t(p.name))}</h3><span class="card__go" aria-hidden="true">${ARROW}</span></div><p class="card__loc">${PIN}<span>${esc(t(p.city))}, ${esc(t(p.area))}</span></p>${showSummary ? `<p class="card__sum">${esc(t(p.summary))}</p>` : ""}<dl class="card__facts">${facts}</dl></div></a>`;
 }
 
 function field(lang, { id, name, label, type = "text", required = false, full = false, options = null, auto = "", value = "" }) {
@@ -334,23 +337,26 @@ function pageHero(lang, { img, title, lead = "", trail, size = "l", caption = ""
 
 function projectsHub(lang) {
   const c = pages.projects[lang], u = ui[lang], t = L(lang);
-  const hero = pageHero(lang, { img: "kava-tiberias/02", title: c.h1, lead: c.lead, trail: [[c.h1, null]], size: "m", caption: (lang === "he" ? "KAVA, טבריה. " : "KAVA, Tiberias. ") + u.render });
+  const hero = pageHero(lang, { img: "kava-tiberias/02", title: c.h1, lead: c.lead, trail: [[c.h1, null]], size: "hub", caption: (lang === "he" ? "KAVA, טבריה. " : "KAVA, Tiberias. ") + u.render });
   const order = [...byStatus("marketing"), ...byStatus("planning"), ...byStatus("occupied")];
   const body = `
 ${hero.html}
-<div class="wrap">
-  <div class="filters" role="search" aria-label="${u.filterLabel}">
-    <div class="seg" role="group" aria-label="${u.filterLabel}">
-      <button type="button" data-status="all" aria-pressed="true">${u.status.all}<span class="num">${projects.length}</span></button>
-      ${statuses.map((s) => `<button type="button" data-status="${s}" aria-pressed="false">${u.status[s]}<span class="num">${byStatus(s).length}</span></button>`).join("")}
+<div class="hub">
+  <div class="wrap">
+    <div class="finder" role="search" aria-label="${u.filterLabel}">
+      <div class="tabs2" role="group" aria-label="${u.filterLabel}">
+        <button type="button" data-status="all" aria-pressed="true">${u.status.all}<span class="num">${projects.length}</span></button>
+        ${statuses.map((s) => `<button type="button" data-status="${s}" aria-pressed="false">${u.status[s]}<span class="num">${byStatus(s).length}</span></button>`).join("")}
+      </div>
+      <div class="finder__side">
+        <label class="sel" for="f-city"><span class="sr">${u.city}</span>${PIN}<select id="f-city"><option value="all">${u.allCities}</option>${cityIndex(lang).sort((a, b) => a[1].name.localeCompare(b[1].name, lang)).map(([k, v]) => `<option value="${k}">${esc(v.name)}</option>`).join("")}</select></label>
+        <p class="finder__count" data-count data-tpl="${u.results("{n}")}" aria-live="polite">${u.results(projects.length)}</p>
+      </div>
     </div>
-    <label for="f-city">${u.city}<select id="f-city"><option value="all">${u.allCities}</option>${cityIndex(lang).sort((a, b) => a[1].name.localeCompare(b[1].name, lang)).map(([k, v]) => `<option value="${k}">${esc(v.name)}</option>`).join("")}</select></label>
-    <p class="filters__count" data-count data-tpl="${u.results("{n}")}" aria-live="polite">${u.results(projects.length)}</p>
+    <h2 class="sr">${c.h1}</h2>
+    <div class="cgrid" data-projects>${order.map((p) => card(lang, p)).join("")}</div>
   </div>
-  <h2 class="sr">${c.h1}</h2>
-  <div class="pgrid" data-projects>${order.map((p, i) => card(lang, p, { showSummary: true, sizes: i % 5 < 2 ? "(max-width:700px) 100vw, 50vw" : "(max-width:700px) 100vw, 33vw" })).join("")}</div>
 </div>
-<div class="spacer"></div>
 ${contactBand(lang, pages.home[lang].contactTitle, "")}`;
   const ld = { "@context": "https://schema.org", "@type": "ItemList", itemListElement: order.map((p, i) => ({ "@type": "ListItem", position: i + 1, url: DOMAIN + href(lang, projPath(p)), name: t(p.name) })) };
   return layout(lang, { path: routes.projects, nav: "projects", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld, ld], og: "/og/projects.jpg" });

@@ -210,22 +210,8 @@ body.menu-open{overflow:hidden}
 @media (max-width:860px){.finder{flex-direction:column;align-items:stretch}.finder__side{justify-content:space-between;padding-inline:4px}.sel{flex:1}.sel select{inline-size:100%;min-inline-size:0}}
 @media (max-width:640px){.cgrid{grid-template-columns:1fr}.finder{border-radius:18px}.tabs2 button{padding:0 14px}}
 
-.feat{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(28px,3vw,44px) clamp(20px,2.4vw,36px)}
-.feat>.card:nth-child(1){grid-column:span 7;grid-row:span 2}
-.feat>.card:nth-child(1) .card__media{aspect-ratio:4/3.4}
-.feat>.card:nth-child(2),.feat>.card:nth-child(3){grid-column:span 5}
-.feat>.card:nth-child(4){grid-column:span 12}
-.feat>.card:nth-child(4) .card__media{aspect-ratio:21/8}
-@media (max-width:900px){.feat{grid-template-columns:1fr}.feat>.card{grid-column:auto!important;grid-row:auto!important}.feat>.card .card__media{aspect-ratio:3/2!important}}
 
 /* status tabs (home) */
-.tabs{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line)}
-.tabs a{flex:1 1 0;min-inline-size:150px;padding:22px 24px;text-decoration:none;border-inline-start:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.tabs a:first-child{border-inline-start:0}
-.tabs a:hover{background:var(--paper)}
-.tabs b{font-weight:500;color:var(--ink);font-size:18px}
-.tabs .num{font-size:28px;color:var(--navy);font-weight:500;line-height:1}
-@media (max-width:700px){.tabs a{flex-basis:100%;border-inline-start:0;border-block-start:1px solid var(--line)}.tabs a:first-child{border-block-start:0}}
 
 /* split media + text */
 .split{display:grid;grid-template-columns:7fr 5fr;gap:clamp(36px,5vw,80px);align-items:center}
@@ -645,3 +631,12 @@ a.art[href]:hover .card__go{background:var(--navy);color:#fff}
 .art--lead .art__title{font-size:clamp(26px,2.6vw,38px);line-height:1.25;-webkit-line-clamp:4;font-weight:600}
 .art--lead .art__go{margin-block-start:12px}
 @media (max-width:900px){.art--lead{grid-template-columns:1fr}.art--lead .art__media{min-block-size:0;aspect-ratio:16/10}}
+
+/* status tiles under featured projects (home) */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tabs a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:22px 24px;border-radius:var(--r-card);background:#f3f5f8;text-decoration:none;transition:background-color .25s var(--ease),color .25s var(--ease)}
+.tabs b{font-weight:600;color:var(--ink);font-size:18px}
+.tabs .num{display:inline-grid;place-items:center;min-inline-size:44px;block-size:44px;border-radius:999px;background:#fff;color:var(--navy);font-size:18px;font-weight:600}
+.tabs a:hover{background:var(--navy)}
+.tabs a:hover b{color:#fff}
+@media (max-width:700px){.tabs{grid-template-columns:1fr}}

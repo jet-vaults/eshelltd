@@ -247,7 +247,7 @@ function home(lang) {
   const c = pages.home[lang], u = ui[lang], t = L(lang);
   const heroKey = "neot-navon/01";
   const heroSizes = "100vw";
-  const featured = ["neot-navon-haifa", "kava-tiberias", "haparsa-rechasim", "elad-center"].map((s) => projects.find((p) => p.slug === s));
+  const featured = ["neot-navon-haifa", "kava-tiberias", "haparsa-rechasim", "elad-center", "ahuzat-yaar-nofit", "nofim-maalot"].map((s) => projects.find((p) => p.slug === s));
   const body = `
 <section class="hero" aria-labelledby="hero-h">
   ${pic(heroKey, { alt: c.heroCaption, sizes: heroSizes, cls: "hero__img", eager: true })}
@@ -274,7 +274,7 @@ function home(lang) {
 <section class="sec" aria-labelledby="feat-h">
   <div class="wrap">
     <div class="sec__head sec__head--row"><div><h2 class="h-l" id="feat-h">${c.featuredTitle}</h2><p class="lead muted" style="margin-top:14px">${c.featuredText}</p></div><a class="link" href="${href(lang, routes.projects)}">${u.allProjects}${ARROW}</a></div>
-    <div class="feat">${featured.map((p, i) => card(lang, p, { sizes: i === 0 ? "(max-width:900px) 100vw, 58vw" : i === 3 ? "100vw" : "(max-width:900px) 100vw, 42vw", showSummary: true })).join("")}</div>
+    <div class="cgrid">${featured.map((p) => card(lang, p)).join("")}</div>
     <nav class="tabs" style="margin-top:clamp(48px,6vw,80px)" aria-label="${u.filterLabel}">${statuses.map((s) => `<a href="${href(lang, routes.projects)}?status=${s}"><b>${u.status[s]}</b><span class="num">${byStatus(s).length}</span></a>`).join("")}</nav>
   </div>
 </section>

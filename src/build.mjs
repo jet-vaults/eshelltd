@@ -301,7 +301,7 @@ ${homeHero(lang, HOME_HERO)}
 
 <section class="sec" aria-labelledby="feat-h">
   <div class="wrap">
-    <div class="sec__head sec__head--row"><div><h2 class="h-l" id="feat-h">${c.featuredTitle}</h2><p class="lead muted" style="margin-top:14px">${c.featuredText}</p></div><a class="link" href="${href(lang, routes.projects)}">${u.allProjects}${ARROW}</a></div>
+    <div class="sec__head sec__head--row"><div><h2 class="h-l" id="feat-h">${c.featuredTitle}</h2><p class="lead muted" style="margin-top:14px">${c.featuredText}</p></div><a class="btn btn--blue" href="${href(lang, routes.projects)}">${u.allProjects}${ARROW}</a></div>
     <div class="cgrid">${featured.map((p) => card(lang, p)).join("")}</div>
   </div>
 </section>
@@ -440,7 +440,7 @@ ${p.video ? `<section class="sec" aria-labelledby="vid-h"><div class="wrap"><div
   </div>
 </section>
 <section class="sec" aria-labelledby="rel-h">
-  <div class="wrap"><div class="sec__head sec__head--row"><h2 class="h-m" id="rel-h">${u.related}</h2><a class="link" href="${href(lang, routes.projects)}">${u.allProjects}${ARROW}</a></div>
+  <div class="wrap"><div class="sec__head sec__head--row"><h2 class="h-m" id="rel-h">${u.related}</h2><a class="btn btn--blue" href="${href(lang, routes.projects)}">${u.allProjects}${ARROW}</a></div>
   <div class="rel">${related.map((r) => card(lang, r)).join("")}</div></div>
 </section>`;
   const ld = { "@context": "https://schema.org", "@type": "Place", name: t(p.name), description: t(p.summary), address: { "@type": "PostalAddress", addressLocality: t(p.city), addressCountry: "IL" }, ...(heroImg ? { image: DOMAIN + largest(heroImg) } : {}), url: DOMAIN + href(lang, projPath(p)) };

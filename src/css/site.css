@@ -799,3 +799,7 @@ html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
 .way__ico{inline-size:34px;block-size:34px}
 .way__icon{inline-size:76px;block-size:76px;border-radius:20px}
 .way__ico{inline-size:44px;block-size:44px}
+
+.btn--blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn--blue:hover{background:var(--navy);border-color:var(--navy)}
+.sec__head--row{align-items:center}

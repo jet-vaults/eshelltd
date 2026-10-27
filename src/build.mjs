@@ -277,7 +277,6 @@ function home(lang) {
   <div class="wrap">
     <div class="sec__head sec__head--row"><div><h2 class="h-l" id="feat-h">${c.featuredTitle}</h2><p class="lead muted" style="margin-top:14px">${c.featuredText}</p></div><a class="link" href="${href(lang, routes.projects)}">${u.allProjects}${ARROW}</a></div>
     <div class="cgrid">${featured.map((p) => card(lang, p)).join("")}</div>
-    <nav class="tabs" style="margin-top:clamp(48px,6vw,80px)" aria-label="${u.filterLabel}">${statuses.map((s) => `<a href="${href(lang, routes.projects)}?status=${s}"><b>${u.status[s]}</b><span class="num">${byStatus(s).length}</span></a>`).join("")}</nav>
   </div>
 </section>
 

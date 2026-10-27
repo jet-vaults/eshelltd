@@ -249,7 +249,7 @@ function cityIndex(lang) {
 
 // Home hero. Five background treatments; HOME_HERO picks the live one,
 // /hero-options/ (noindex, unlinked) shows all five for the client to choose.
-const HOME_HERO = "a";
+const HOME_HERO = "b";
 const HERO_VARIANTS = {
   a: { name: "תמונה בהירה עם שכבת כחול רכה", img: "neot-navon/03" },
   b: { name: "תמונת ערב דרמטית", img: "neot-navon/01" },
@@ -278,12 +278,6 @@ function homeHero(lang, v, label = "") {
   ${light ? `<div class="wrap hero__pano">${pic(V.img, { alt: "", sizes: "(max-width:1400px) 100vw, 1320px", eager: true })}</div>` : ""}
 </section>`;
 }
-function heroOptions() {
-  const lang = "he";
-  const body = Object.keys(HERO_VARIANTS).map((k, i) => homeHero(lang, k, `אפשרות ${i + 1} - ${HERO_VARIANTS[k].name}`)).join("\n<div class=\"hv-gap\"></div>\n");
-  return layout(lang, { path: "/hero-options/", title: "אפשרויות רקע לעמוד הבית | אשל הירדן", description: "השוואת רקעים לעמוד הבית", body })
-    .replace('<link rel="canonical"', '<meta name="robots" content="noindex, nofollow"><link rel="canonical"');
-}
 
 function home(lang) {
   const c = pages.home[lang], u = ui[lang], t = L(lang);
@@ -297,7 +291,8 @@ ${homeHero(lang, HOME_HERO)}
   <div class="wrap"><div class="scale">${c.scale.map((s) => `<div><span class="scale__v num">${s.value}</span><span class="scale__l">${s.label}</span></div>`).join("")}</div></div>
 </section>
 
-<section class="sec sec--navy on-dark" aria-labelledby="roof-h">
+<section class="sec sec--navy on-dark roof-sec" aria-labelledby="roof-h">
+  <div class="hero__layers" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="wrap">
     <div class="roof__head rv"><h2 class="h-l" id="roof-h">${c.roofTitle.join(" ")}</h2><p>${c.roofText}</p></div>
     <ol class="roof3" role="list">${c.roof.map((r) => `<li class="rv"><h3>${r.title}</h3><p>${r.text}</p></li>`).join("")}</ol>
@@ -640,7 +635,6 @@ for (const lang of LANGS) {
   }
 }
 write("/404.html", notFound());
-write("/hero-options/", heroOptions());
 
 // sitemap with hreflang alternates
 const today = new Date().toISOString().slice(0, 10);
@@ -651,7 +645,6 @@ ${sitemapUrls.flatMap((p) => LANGS.map((l) => `<url><loc>${DOMAIN}${href(l, p)}<
 `);
 writeFileSync(join(OUT, "robots.txt"), `User-agent: *
 Allow: /
-Disallow: /hero-options/
 
 Sitemap: ${DOMAIN}/sitemap.xml
 `);

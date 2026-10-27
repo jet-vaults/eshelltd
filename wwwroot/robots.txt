@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /hero-options/
 
 Sitemap: https://eshelltd.co.il/sitemap.xml

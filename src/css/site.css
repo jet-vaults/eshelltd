@@ -735,3 +735,8 @@ html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
 .hv-gap{block-size:40px;background:#fff}
 
 .hero .hero__pano picture{position:static;inset:auto}
+
+/* one-roof section: brand navy with the logo layers (from hero option 5) */
+.roof-sec{position:relative;overflow:hidden;background:radial-gradient(ellipse at 70% 20%,#1b3a6b 0%,var(--navy) 45%,var(--navy-3) 100%)}
+.roof-sec>.wrap{position:relative;z-index:1}
+.roof-sec .roof3 li{background:rgba(22,48,90,.72);backdrop-filter:blur(6px)}

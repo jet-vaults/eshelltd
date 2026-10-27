@@ -48,6 +48,10 @@ const css = minCss(readFileSync(join(ROOT, "src/css/site.css"), "utf8"));
 const js = readFileSync(join(ROOT, "src/js/site.js"), "utf8").replace(/^\s*\/\*[\s\S]*?\*\/\s*/m, "");
 const jsName = `site.${hash(js)}.js`;
 
+const FLAG = {
+  en: `<svg class="flag" viewBox="0 0 60 30" aria-hidden="true"><clipPath id="fuk"><path d="M0 0v30h60V0z"/></clipPath><clipPath id="fuk2"><path d="M30 15h30v15zv15H0zH0V0zV0h30z"/></clipPath><g clip-path="url(#fuk)"><path d="M0 0v30h60V0z" fill="#012169"/><path d="M0 0l60 30m0-30L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30m0-30L0 30" clip-path="url(#fuk2)" stroke="#C8102E" stroke-width="4"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></g></svg>`,
+  he: `<svg class="flag" viewBox="0 0 220 160" aria-hidden="true"><path fill="#fff" d="M0 0h220v160H0z"/><path fill="#0038b8" d="M0 15h220v25H0zm0 105h220v25H0z"/><path fill="none" stroke="#0038b8" stroke-width="5.5" d="M110 52.7 85.7 94.8h48.6zm0 54.6L85.7 65.2h48.6z"/></svg>`,
+};
 // ---------------------------------------------------------------- layout
 function layout(lang, o) {
   const u = ui[lang], t = L(lang), other = lang === "he" ? "en" : "he";
@@ -104,9 +108,9 @@ ${o.preload || ""}
     <div class="hdr__util">
       <a href="${href(lang, routes.residents)}">${u.residents}</a>
       <a href="tel:${company.phone}" class="num" dir="ltr">${company.phone}</a>
-      <a class="lang" href="${switchHref}" hreflang="${other}" lang="${other}" aria-label="${u.langSwitchLabel}">${u.langSwitch}</a>
+      <a class="lang" href="${switchHref}" hreflang="${other}" lang="${other}" aria-label="${u.langSwitchLabel}">${FLAG[other]}<span>${other === "en" ? "EN" : "עב"}</span></a>
     </div>
-    <a class="hdr__mob-lang" href="${switchHref}" hreflang="${other}" lang="${other}" aria-label="${u.langSwitchLabel}">${u.langSwitch}</a>
+    <a class="hdr__mob-lang lang" href="${switchHref}" hreflang="${other}" lang="${other}" aria-label="${u.langSwitchLabel}">${FLAG[other]}<span>${other === "en" ? "EN" : "עב"}</span></a>
     <button class="burger" type="button" aria-expanded="false" aria-controls="mnav"><span></span><b class="sr">${u.menu}</b></button>
   </div>
 </header>
@@ -195,7 +199,7 @@ function card(lang, p, { sizes = "(max-width:640px) 100vw, (max-width:1000px) 50
     ? `<div class="card__media">${pic(p.images[0], { alt: `${t(p.name)}, ${t(p.city)} - ${u.render}`, sizes, max: 1280 })}${chip}</div>`
     : `<div class="card__media card__media--none"><span>${esc(t(p.name))}</span>${chip}</div>`;
   const facts = p.facts.slice(0, 2).map((f) => `<div><dt>${esc(t(f.label))}</dt><dd class="num">${esc(t(f.value))}</dd></div>`).join("");
-  return `<a class="card" href="${href(lang, projPath(p))}" data-st="${p.status}" data-city="${citySlug(p)}">${media}<div class="card__body"><div class="card__top"><h3 class="card__name">${esc(t(p.name))}</h3><span class="card__go" aria-hidden="true">${ARROW}</span></div><p class="card__loc">${PIN}<span>${esc(t(p.city))}, ${esc(t(p.area))}</span></p>${showSummary ? `<p class="card__sum">${esc(t(p.summary))}</p>` : ""}<dl class="card__facts">${facts}</dl></div></a>`;
+  return `<a class="card" href="${href(lang, projPath(p))}" data-st="${p.status}" data-city="${citySlug(p)}">${media}<div class="card__body"><h3 class="card__name">${esc(t(p.name))}</h3><p class="card__loc">${PIN}<span>${esc(t(p.city))}, ${esc(t(p.area))}</span></p>${showSummary ? `<p class="card__sum">${esc(t(p.summary))}</p>` : ""}<dl class="card__facts">${facts}</dl></div></a>`;
 }
 
 function field(lang, { id, name, label, type = "text", required = false, full = false, options = null, auto = "", value = "" }) {
@@ -245,18 +249,17 @@ function cityIndex(lang) {
 
 function home(lang) {
   const c = pages.home[lang], u = ui[lang], t = L(lang);
-  const heroKey = "neot-navon/01";
-  const heroSizes = "100vw";
+  const heroKey = "neot-navon/03";
+  const heroSizes = "(orientation:portrait) 130vh, 100vw";
   const featured = ["neot-navon-haifa", "kava-tiberias", "haparsa-rechasim", "elad-center", "ahuzat-yaar-nofit", "nofim-maalot"].map((s) => projects.find((p) => p.slug === s));
   const body = `
-<section class="hero" aria-labelledby="hero-h">
-  ${pic(heroKey, { alt: c.heroCaption, sizes: heroSizes, cls: "hero__img", eager: true })}
+<section class="hero hero--center" aria-labelledby="hero-h">
+  ${pic(heroKey, { alt: lang === "he" ? "נאות נבון, חיפה - הדמיה" : "Neot Navon, Haifa - rendering", sizes: heroSizes, cls: "hero__img", eager: true })}
   <div class="wrap hero__in">
-    <h1 class="h-xl" id="hero-h">${c.heroLines.map((l) => `<span>${l}</span>`).join("")}</h1>
+    <h1 class="hero__line" id="hero-h">${c.heroLines.map((l, i) => `<span style="--i:${i}">${l}</span>`).join(" ")}</h1>
     <p class="hero__text">${c.heroText}</p>
     <div class="hero__cta"><a class="btn btn--light" href="${href(lang, routes.projects)}">${c.cta1}${ARROW}</a><a class="btn btn--ghost-light" href="${href(lang, routes.renewal)}">${c.cta2}</a></div>
   </div>
-  <p class="hero__cap">${c.heroCaption}</p>
 </section>
 
 <section aria-label="${lang === "he" ? "החברה במספרים" : "The company in numbers"}">
@@ -264,10 +267,9 @@ function home(lang) {
 </section>
 
 <section class="sec sec--navy on-dark" aria-labelledby="roof-h">
-  <div class="wrap roof">
-    <div class="roof__text rv">${layers}<h2 class="h-l" id="roof-h">${c.roofTitle.map((l) => `<span style="display:block">${l}</span>`).join("")}</h2><p>${c.roofText}</p>
-      <p><a class="link" href="${href(lang, routes.about)}">${u.nav.about}${ARROW}</a></p></div>
-    <ol class="stack" role="list">${c.roof.map((r) => `<li class="stack__item rv"><h3>${r.title}</h3><p>${r.text}</p></li>`).join("")}</ol>
+  <div class="wrap">
+    <div class="roof__head rv"><h2 class="h-l" id="roof-h">${c.roofTitle.join(" ")}</h2><p>${c.roofText}</p></div>
+    <ol class="roof3" role="list">${c.roof.map((r) => `<li class="rv"><h3>${r.title}</h3><p>${r.text}</p></li>`).join("")}</ol>
   </div>
 </section>
 
@@ -288,14 +290,8 @@ function home(lang) {
   </div>
 </section>
 
-<section class="sec" aria-labelledby="cities-h">
-  <div class="wrap">
-    <div class="sec__head"><h2 class="h-m" id="cities-h">${c.citiesTitle}</h2><p class="muted">${c.citiesText}</p></div>
-    <div class="cities rv">${cityIndex(lang).map(([k, v]) => `<a href="${href(lang, routes.projects)}?city=${k}">${esc(v.name)}<span class="num">${v.n}</span></a>`).join("")}</div>
-  </div>
-</section>
 
-<section class="sec sec--tight sec--paper" aria-labelledby="partners-h">
+<section class="sec sec--tight" aria-labelledby="partners-h">
   <div class="wrap">
     <div class="sec__head"><h2 class="h-m" id="partners-h">${c.partnersTitle}</h2></div>
     <ul class="logos" role="list">${partners.map((p) => `<li><img src="/assets/partners/${p.file}.webp" alt="${esc(p.name)}" loading="lazy" decoding="async" width="240" height="100"></li>`).join("")}</ul>
@@ -317,7 +313,7 @@ function contactBand(lang, title, text) {
 }
 
 // Inner-page hero: the architecture leads every page, like the home page.
-function pageHero(lang, { img, title, lead = "", trail, size = "l", caption = "", preloadSizes = "100vw" }) {
+function pageHero(lang, { img, title, lead = "", trail, size = "l", caption = "", preloadSizes = "(orientation:portrait) 130vh, 100vw" }) {
   const cr = crumbs(lang, trail);
   const t = Array.isArray(title) ? title.map((l) => `<span>${l}</span>`).join("") : title;
   return {
@@ -330,7 +326,6 @@ function pageHero(lang, { img, title, lead = "", trail, size = "l", caption = ""
     <h1 class="${size === "s" ? "h-l" : "h-xl"}" id="page-h">${t}</h1>
     ${lead ? `<p class="ihero__lead">${lead}</p>` : ""}
   </div>
-  ${img && caption ? `<p class="hero__cap">${esc(caption)}</p>` : ""}
 </section>`,
   };
 }
@@ -374,7 +369,7 @@ function projectPage(lang, p) {
   const tel = p.phone ? p.phone.replace(/[^0-9*+]/g, "") : "";
   const body = `
 <section class="ihero ihero--project ihero--framed${heroImg ? "" : " ihero--plain"}" aria-labelledby="page-h">
-  ${heroImg ? pic(heroImg, { alt: alt(0), sizes: "(max-width:1520px) 100vw, 1480px", cls: "ihero__img", eager: true }) : ""}
+  ${heroImg ? pic(heroImg, { alt: alt(0), sizes: "(orientation:portrait) 130vh, (max-width:1520px) 100vw, 1480px", cls: "ihero__img", eager: true }) : ""}
   <div class="wrap ihero__in ihero__in--split">
     <div>
       ${cr.html.replace('class="crumbs"', 'class="crumbs crumbs--light"')}
@@ -384,7 +379,6 @@ function projectPage(lang, p) {
     </div>
     <div class="ihero__cta">${p.status !== "occupied" ? `<a class="btn btn--light" href="#inquiry">${u.leaveDetails}${ARROW}</a>` : ""}${tel ? `<a class="btn btn--ghost-light num" href="tel:${tel}" dir="ltr">${p.phone}</a>` : ""}</div>
   </div>
-  ${heroImg ? `<p class="hero__cap">${u.render}</p>` : ""}
 </section>
 
 <section class="figs" aria-label="${u.facts}">
@@ -426,7 +420,7 @@ ${p.video ? `<section class="sec" aria-labelledby="vid-h"><div class="wrap"><div
 </section>`;
   const ld = { "@context": "https://schema.org", "@type": "Place", name: t(p.name), description: t(p.summary), address: { "@type": "PostalAddress", addressLocality: t(p.city), addressCountry: "IL" }, ...(heroImg ? { image: DOMAIN + largest(heroImg) } : {}), url: DOMAIN + href(lang, projPath(p)) };
   const title = `${t(p.name)}, ${t(p.city)} | ${company.name[lang]}`;
-  return layout(lang, { path: projPath(p), nav: "projects", title, description: t(p.summary), body, preload: heroImg ? preloadImg(heroImg, "(max-width:1520px) 100vw, 1480px") : "", ld: [cr.ld, ld], og: `/og/${p.slug}.jpg` });
+  return layout(lang, { path: projPath(p), nav: "projects", title, description: t(p.summary), body, preload: heroImg ? preloadImg(heroImg, "(orientation:portrait) 130vh, (max-width:1520px) 100vw, 1480px") : "", ld: [cr.ld, ld], og: `/og/${p.slug}.jpg` });
 }
 
 const BENEFIT_GROUPS = {
@@ -472,9 +466,6 @@ ${hero.html}
 <section class="sec" aria-label="${u.nav.about}"><div class="wrap story">
   <p class="story__h h-l">${c.story[0].split(/(?<=\.)\s/)[0]}</p>
   <div class="story__body"><p>${c.story[0].split(/(?<=\.)\s/).slice(1).join(" ")}</p>${c.story.slice(1).map((p) => `<p>${p}</p>`).join("")}</div></div></section>
-<section class="sec sec--navy on-dark" aria-labelledby="roof-h"><div class="wrap roof">
-  <div class="roof__text">${layers}<h2 class="h-l" id="roof-h">${h.roofTitle.map((l) => `<span style="display:block">${l}</span>`).join("")}</h2><p>${h.roofText}</p></div>
-  <ol class="stack" role="list">${h.roof.map((r) => `<li class="stack__item"><h3>${r.title}</h3><p>${r.text}</p></li>`).join("")}</ol></div></section>
 <section class="sec" aria-labelledby="val-h"><div class="wrap">
   <div class="sec__head"><h2 class="h-l" id="val-h">${c.valuesTitle}</h2></div>
   <div class="quad">${c.values.map((v) => `<div class="rv"><h3>${v.title}</h3><p>${v.text}</p></div>`).join("")}</div></div></section>
@@ -482,8 +473,6 @@ ${hero.html}
   ${pic("rova-alonim-villas/00", { alt: "", sizes: "100vw", cls: "band__img", max: 1920 })}
   <div class="wrap band__in"><h2 class="h-m" id="fld-h">${c.fieldsTitle}</h2><ul class="band__list">${c.fields.map((f) => `<li>${f}</li>`).join("")}</ul></div>
 </section>
-<section class="sec" aria-labelledby="reg-h"><div class="wrap"><div class="sec__head"><h2 class="h-l" id="reg-h">${c.regionsTitle}</h2></div>
-  <div class="cities">${cityIndex(lang).map(([k, v]) => `<a href="${href(lang, routes.projects)}?city=${k}">${esc(v.name)}<span class="num">${v.n}</span></a>`).join("")}</div></div></section>
 <section class="sec sec--tight sec--paper" aria-labelledby="car-h"><div class="wrap"><div class="sec__head sec__head--row" style="margin:0"><div><h2 class="h-m" id="car-h">${c.ctaTitle}</h2><p class="muted" style="margin-top:10px">${c.ctaText}</p></div><a class="btn" href="${href(lang, routes.careers)}">${u.nav.careers}${ARROW}</a></div></div></section>`;
   return layout(lang, { path: routes.about, nav: "about", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld], og: "/og/about.jpg" });
 }
@@ -544,7 +533,7 @@ function pressPage(lang) {
     const attrs = g ? ` href="${g.href}"${g.ext ? ' target="_blank" rel="noopener"' : ""}` : "";
     return `<a class="art${lead ? " art--lead" : ""}"${attrs}>
       <div class="art__media">${pic(x.img, { alt: "", sizes: lead ? "(max-width:900px) 100vw, 60vw" : "(max-width:640px) 100vw, (max-width:1060px) 50vw, 33vw", max: lead ? 1920 : 1280, eager: lead })}</div>
-      <div class="art__body">${meta(x)}<h2 class="art__title" lang="he" dir="rtl">${esc(x.title)}</h2>${g ? `<span class="art__go">${g.label}<span class="card__go" aria-hidden="true">${ARROW}</span></span>` : ""}</div>
+      <div class="art__body">${meta(x)}<h2 class="art__title" lang="he" dir="rtl">${esc(x.title)}</h2>${g ? `<span class="art__go">${g.label}${ARROW}</span>` : ""}</div>
     </a>`;
   };
   const [first, ...rest] = press;

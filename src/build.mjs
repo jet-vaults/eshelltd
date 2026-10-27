@@ -436,7 +436,7 @@ const BENEFIT_GROUPS = {
 
 function renewalPage(lang) {
   const c = pages.renewal[lang], u = ui[lang], t = L(lang);
-  const hero = pageHero(lang, { img: "ur-yokneam/01", title: c.h1, lead: c.lead, trail: [[u.nav.renewal, null]], size: "l", caption: t(renewal[0].name) + ". " + u.render });
+  const hero = pageHero(lang, { img: "ur-hero/00", title: c.h1, lead: c.lead, trail: [[u.nav.renewal, null]], size: "l", caption: (lang === "he" ? "התחדשות עירונית, נהריה. " : "Urban renewal, Nahariya. ") + u.render });
   const body = `
 ${hero.html}
 <section class="figs" aria-label="${c.whyTitle}"><div class="wrap"><dl class="figs__row">${c.why.map((w) => `<div><dt>${w.label}</dt><dd class="num">${w.value}</dd></div>`).join("")}</dl></div></section>
@@ -536,13 +536,24 @@ ${hero.html}
 
 function pressPage(lang) {
   const c = pages.press[lang], u = ui[lang], t = L(lang);
-  const hero = pageHero(lang, { img: "neot-navon/00", title: c.h1, lead: c.lead, trail: [[u.nav.press, null]], size: "s", caption: (lang === "he" ? "נאות נבון, חיפה. " : "Neot Navon, Haifa. ") + u.render });
-  const [lead, ...rest] = press;
-  const linkFor = (x) => x.url ? `<a class="link" href="${x.url}"${x.url.startsWith("http") ? ' target="_blank" rel="noopener"' : ""} hreflang="he">${x.pdf ? c.pdf : c.read}${ARROW}</a>` : x.project ? `<a class="link" href="${href(lang, routes.projects + x.project + "/")}">${u.toProject}${ARROW}</a>` : "";
+  const hero = pageHero(lang, { img: "elad-center/01", title: c.h1, lead: c.lead, trail: [[u.nav.press, null]], size: "s", caption: (lang === "he" ? "אלעד סנטר. " : "Elad Center. ") + u.render });
+  const target = (x) => x.url ? { href: x.url, ext: x.url.startsWith("http"), label: x.pdf ? c.pdf : x.scan ? (lang === "he" ? "לכתבה המלאה" : "Full article") : c.read } : x.project ? { href: href(lang, routes.projects + x.project + "/"), ext: false, label: u.toProject } : null;
+  const meta = (x) => `<p class="art__meta"><time>${t(x.date)}</time>${x.source ? `<span>${esc(x.source)}</span>` : ""}${x.pdf ? `<span>PDF</span>` : ""}</p>`;
+  const art = (x, i, lead) => {
+    const g = target(x);
+    const attrs = g ? ` href="${g.href}"${g.ext ? ' target="_blank" rel="noopener"' : ""}` : "";
+    return `<a class="art${lead ? " art--lead" : ""}"${attrs}>
+      <div class="art__media">${pic(x.img, { alt: "", sizes: lead ? "(max-width:900px) 100vw, 60vw" : "(max-width:640px) 100vw, (max-width:1060px) 50vw, 33vw", max: lead ? 1920 : 1280, eager: lead })}</div>
+      <div class="art__body">${meta(x)}<h2 class="art__title" lang="he" dir="rtl">${esc(x.title)}</h2>${g ? `<span class="art__go">${g.label}<span class="card__go" aria-hidden="true">${ARROW}</span></span>` : ""}</div>
+    </a>`;
+  };
+  const [first, ...rest] = press;
   const body = `
 ${hero.html}
-<section class="sec"><div class="wrap">
-  <ul class="press">${press.map((x) => `<li><time>${t(x.date)}</time><h2 lang="he" dir="rtl">${esc(x.title)}${x.source ? ` <span class="muted" style="font-weight:400">(${esc(x.source)})</span>` : ""}</h2>${linkFor(x) || "<span></span>"}</li>`).join("")}</ul></div></section>`;
+<section class="hub press-hub" aria-label="${c.h1}"><div class="wrap">
+  ${art(first, 0, true)}
+  <div class="cgrid arts">${rest.map((x, i) => art(x, i + 1, false)).join("")}</div>
+</div></section>`;
   return layout(lang, { path: routes.press, nav: "press", title: c.title, description: c.description, body, preload: hero.preload, ld: [hero.ld] });
 }
 

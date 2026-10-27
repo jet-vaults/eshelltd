@@ -45,9 +45,9 @@ def render(path):
         r = im if w == w0 else im.resize((w, h), Image.LANCZOS)
         base = os.path.join(OUT, slug, f"{name}-{w}")
         if not os.path.exists(base + ".avif"):
-            r.save(base + ".avif", "AVIF", quality=52, speed=6)
+            r.save(base + ".avif", "AVIF", quality=64, speed=6)
         if not os.path.exists(base + ".webp"):
-            r.save(base + ".webp", "WEBP", quality=78, method=5)
+            r.save(base + ".webp", "WEBP", quality=85, method=5)
     return f"{slug}/{name}", {"w": w0, "h": h0, "widths": widths}
 
 

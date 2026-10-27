@@ -29,7 +29,7 @@ const PLAY = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentCol
 const A11Y = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"/></svg>`;
 
 // <picture> with AVIF + WebP sources; width/height always declared (no CLS)
-function pic(key, { alt = "", sizes = "100vw", cls = "", eager = false, max = 2560 } = {}) {
+function pic(key, { alt = "", sizes = "100vw", cls = "", eager = false, max = 3840 } = {}) {
   const m = IMG[key];
   if (!m) throw new Error("missing image " + key);
   const ws = m.widths.filter((w) => w <= max);
@@ -260,7 +260,7 @@ const HERO_VARIANTS = {
 function homeHero(lang, v, label = "") {
   const c = pages.home[lang];
   const V = HERO_VARIANTS[v];
-  const sizes = "(orientation:portrait) 130vh, 100vw";
+  const sizes = "(orientation:portrait) 130vh, 125vw";
   const light = v === "d";
   const words = c.heroLines.map((l, i) => `<span style="--i:${i}">${l}</span>`).join(" ");
   let bg = "";
@@ -282,7 +282,7 @@ function homeHero(lang, v, label = "") {
 function home(lang) {
   const c = pages.home[lang], u = ui[lang], t = L(lang);
   const heroKey = HERO_VARIANTS[HOME_HERO].img || "neot-navon/03";
-  const heroSizes = "(orientation:portrait) 130vh, 100vw";
+  const heroSizes = "(orientation:portrait) 130vh, 125vw";
   const featured = ["neot-navon-haifa", "kava-tiberias", "haparsa-rechasim", "elad-center", "ahuzat-yaar-nofit", "nofim-maalot"].map((s) => projects.find((p) => p.slug === s));
   const body = `
 ${homeHero(lang, HOME_HERO)}
@@ -308,9 +308,9 @@ ${homeHero(lang, HOME_HERO)}
 
 <section class="sec sec--paper" aria-labelledby="ur-h">
   <div class="wrap split">
-    <div class="split__media rv">${pic("ur-haifa-hatoren/00", { alt: t(renewal[2].name) + " - " + u.render, sizes: "(max-width:900px) 100vw, 58vw", max: 1920 })}</div>
+    <div class="split__media rv">${pic("ur-haifa-hatoren/00", { alt: t(renewal[2].city) + ", " + t(renewal[2].name) + " - " + u.render, sizes: "(max-width:900px) 100vw, 58vw", max: 1920 })}</div>
     <div class="rv">${layers}<h2 class="h-l" id="ur-h">${c.renewalTitle}</h2><p class="lead" style="margin-top:20px">${c.renewalText}</p>
-      <ul class="ur-list">${renewal.map((r) => `<li><b>${esc(t(r.name))}</b><span class="num">${esc(t(r.facts[1].value))} ${lang === "he" ? "יח\"ד חדשות" : "new homes"}</span></li>`).join("")}</ul>
+      <ul class="ur-list">${renewal.map((r) => `<li><b>${esc(t(r.city))} - ${esc(t(r.name))}</b><span class="num">${esc(t(r.facts[1].value))} ${lang === "he" ? "יח\"ד חדשות" : "new homes"}</span></li>`).join("")}</ul>
       <a class="btn" href="${href(lang, routes.renewal)}">${c.renewalCta}${ARROW}</a></div>
   </div>
 </section>
@@ -338,7 +338,7 @@ function contactBand(lang, title, text) {
 }
 
 // Inner-page hero: the architecture leads every page, like the home page.
-function pageHero(lang, { img, title, lead = "", trail, size = "l", caption = "", preloadSizes = "(orientation:portrait) 130vh, 100vw" }) {
+function pageHero(lang, { img, title, lead = "", trail, size = "l", caption = "", preloadSizes = "(orientation:portrait) 130vh, 125vw" }) {
   const cr = crumbs(lang, trail);
   const t = Array.isArray(title) ? title.map((l) => `<span>${l}</span>`).join("") : title;
   return {
@@ -394,7 +394,7 @@ function projectPage(lang, p) {
   const tel = p.phone ? p.phone.replace(/[^0-9*+]/g, "") : "";
   const body = `
 <section class="ihero ihero--project ihero--framed${heroImg ? "" : " ihero--plain"}" aria-labelledby="page-h">
-  ${heroImg ? pic(heroImg, { alt: alt(0), sizes: "(orientation:portrait) 130vh, (max-width:1520px) 100vw, 1480px", cls: "ihero__img", eager: true }) : ""}
+  ${heroImg ? pic(heroImg, { alt: alt(0), sizes: "(orientation:portrait) 130vh, (max-width:1520px) 125vw, 1850px", cls: "ihero__img", eager: true }) : ""}
   <div class="wrap ihero__in ihero__in--split">
     <div>
       ${cr.html.replace('class="crumbs"', 'class="crumbs crumbs--light"')}
@@ -445,7 +445,7 @@ ${p.video ? `<section class="sec" aria-labelledby="vid-h"><div class="wrap"><div
 </section>`;
   const ld = { "@context": "https://schema.org", "@type": "Place", name: t(p.name), description: t(p.summary), address: { "@type": "PostalAddress", addressLocality: t(p.city), addressCountry: "IL" }, ...(heroImg ? { image: DOMAIN + largest(heroImg) } : {}), url: DOMAIN + href(lang, projPath(p)) };
   const title = `${t(p.name)}, ${t(p.city)} | ${company.name[lang]}`;
-  return layout(lang, { path: projPath(p), nav: "projects", title, description: t(p.summary), body, preload: heroImg ? preloadImg(heroImg, "(orientation:portrait) 130vh, (max-width:1520px) 100vw, 1480px") : "", ld: [cr.ld, ld], og: `/og/${p.slug}.jpg` });
+  return layout(lang, { path: projPath(p), nav: "projects", title, description: t(p.summary), body, preload: heroImg ? preloadImg(heroImg, "(orientation:portrait) 130vh, (max-width:1520px) 125vw, 1850px") : "", ld: [cr.ld, ld], og: `/og/${p.slug}.jpg` });
 }
 
 const BENEFIT_GROUPS = {
@@ -467,7 +467,7 @@ ${hero.html}
   <ol class="trio" role="list">${c.way.map((w) => `<li class="rv"><h3>${w.title}</h3><p>${w.text}</p></li>`).join("")}</ol></div></section>
 <section class="sec" aria-labelledby="urp-h"><div class="wrap"><div class="sec__head"><h2 class="h-l" id="urp-h">${c.projectsTitle}</h2></div>
   <div class="ur">${renewal.map((r) => `<article class="ur__item rv" aria-labelledby="ur-${r.id}">
-    <div class="ur__media">${r.images.slice(0, 3).map((k, i) => pic(k, { alt: `${t(r.name)} - ${u.render}${i ? " " + (i + 1) : ""}`, sizes: i ? "(max-width:900px) 33vw, 20vw" : "(max-width:900px) 66vw, 40vw", max: 1920 })).join("")}</div>
+    <div class="ur__media">${r.images.slice(0, 3).map((k, i) => pic(k, { alt: `${t(r.city)}, ${t(r.name)} - ${u.render}${i ? " " + (i + 1) : ""}`, sizes: i ? "(max-width:900px) 33vw, 20vw" : "(max-width:900px) 66vw, 40vw", max: 1920 })).join("")}</div>
     <div class="ur__text"><p class="ur__city">${esc(t(r.city))}</p><h3 class="h-m" id="ur-${r.id}">${esc(t(r.name))}</h3><p>${esc(t(r.body))}</p><dl>${r.facts.map((f) => `<div><dt>${esc(t(f.label))}</dt><dd class="num">${esc(t(f.value))}</dd></div>`).join("")}</dl></div>
   </article>`).join("")}</div></div></section>
 <section class="sec sec--paper" aria-labelledby="ben-h"><div class="wrap">

@@ -16,7 +16,7 @@ from PIL import Image, ImageFilter
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src", "images")
 OUT = os.path.join(ROOT, "wwwroot", "img")
-WIDTHS = [480, 800, 1280, 1920, 2560]
+WIDTHS = [480, 800, 1280, 1920, 2560, 3200, 3840]
 
 
 def normalize(crawl):
@@ -27,7 +27,7 @@ def normalize(crawl):
         for n, key in enumerate(pick):
             src = glob.glob(os.path.join(crawl, frm, key + ".*"))[0]
             im = Image.open(src).convert("RGB")
-            im.thumbnail((2560, 2560), Image.LANCZOS)
+            im.thumbnail((3840, 3840), Image.LANCZOS)
             im.save(os.path.join(SRC, slug, f"{n:02d}.jpg"), "JPEG", quality=90, optimize=True, progressive=True)
         print("normalized", slug, len(pick))
 

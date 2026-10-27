@@ -713,7 +713,7 @@ export const renewal = [
   {
     id: "yokneam",
     city: { he: "יקנעם", en: "Yokneam" },
-    name: { he: "יקנעם - הכניסה הצפונית", en: "Yokneam, northern gateway" },
+    name: { he: "הכניסה הצפונית", en: "Northern Gateway" },
     body: {
       he: "תוכנית ההתחדשות העירונית הגדולה ביותר בצפון, בשכונה הוותיקה בכניסה הצפונית ליקנעם, על שטח של כ-97 דונם. התכנון משלב מבני מגורים בגבהים שונים, מתחם ייעודי לדיור מוגן, שטחי מסחר ותעסוקה, מבני ציבור ושטחים פתוחים נרחבים.",
       en: "The largest urban-renewal plan in northern Israel, covering about 97 dunams in the established neighbourhood at Yokneam's northern entrance. The plan combines residential buildings of varying heights, a dedicated assisted-living compound, retail and employment space, public buildings and extensive open space.",
@@ -728,7 +728,7 @@ export const renewal = [
   {
     id: "migdal-haemek",
     city: { he: "מגדל העמק", en: "Migdal HaEmek" },
-    name: { he: "מגדל העמק - קרן היסוד והנשיאים", en: "Migdal HaEmek, Keren HaYesod and HaNesi'im" },
+    name: { he: "קרן היסוד והנשיאים", en: "Keren HaYesod and HaNesi'im" },
     body: {
       he: "בדרום מגדל העמק, מול נופי העמק הפתוחים. התוכנית מחדשת את המרקם העירוני ויוצרת שכונת מגורים מודרנית עם שטחי מסחר, מבני ציבור, שטחים פתוחים ופיתוח סביבתי רחב.",
       en: "In southern Migdal HaEmek, overlooking the open valley. The plan renews the urban fabric with a modern residential neighbourhood, retail, public buildings, open space and extensive landscaping.",
@@ -742,7 +742,7 @@ export const renewal = [
   {
     id: "haifa-hatoren",
     city: { he: "חיפה", en: "Haifa" },
-    name: { he: "חיפה - התורן", en: "Haifa, HaToren" },
+    name: { he: "התורן", en: "HaToren" },
     body: {
       he: "בקו הראשון לים, בלב שכונת עין הים הוותיקה בחיפה. הקרבה לחוף, הפיתוח הסביבתי והשטחים הירוקים יוצרים סביבת מגורים המשתלבת באופייה של השכונה ושל העיר.",
       en: "On Haifa's seafront, at the heart of the established Ein HaYam neighbourhood. The beach, landscaping and green spaces create a residential setting in keeping with the character of the neighbourhood and the city.",

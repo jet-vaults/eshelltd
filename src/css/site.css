@@ -740,3 +740,14 @@ html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
 .roof-sec{position:relative;overflow:hidden;background:radial-gradient(ellipse at 70% 20%,#1b3a6b 0%,var(--navy) 45%,var(--navy-3) 100%)}
 .roof-sec>.wrap{position:relative;z-index:1}
 .roof-sec .roof3 li{background:rgba(22,48,90,.72);backdrop-filter:blur(6px)}
+
+/* urban renewal cards: identical height */
+.ur__item,.ur__item:nth-child(even){align-items:stretch}
+.ur__media{block-size:clamp(340px,32vw,440px);grid-template-rows:1fr 1fr}
+.ur__media>*{min-block-size:0}
+.ur__media img,.ur__media>:first-child img,.ur__media>:not(:first-child) img{aspect-ratio:auto;block-size:100%}
+.ur__text{align-self:center}
+@media (max-width:900px){.ur__media{block-size:auto}.ur__media>:first-child img{aspect-ratio:4/3.2}.ur__media>:not(:first-child) img{aspect-ratio:4/3}}
+
+.ur{grid-auto-rows:1fr}
+.ur__item .ur__media{block-size:auto;min-block-size:clamp(340px,32vw,440px);align-self:stretch}

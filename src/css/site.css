@@ -692,13 +692,12 @@ html.a-motion .hero__line span,html.a-motion .hero--center .hero__text,html.a-mo
 
 /* ===== home hero v2: shorter, logo, strictly sequential words ===== */
 .hero.hero--center{min-block-size:clamp(500px,74svh,760px)}
-.hero__logo{inline-size:clamp(170px,16vw,240px);block-size:auto;margin-block-end:clamp(18px,2.4vw,30px);opacity:0;animation:word-in .8s var(--ease) .1s forwards}
-.hero__line span{opacity:0;transform:translateY(.4em);filter:blur(6px);animation:word-in2 .75s var(--ease) forwards;animation-delay:calc(.7s + var(--i) * .75s)}
+.hero__line span{opacity:0;transform:translateY(.4em);filter:blur(6px);animation:word-in2 .75s var(--ease) forwards;animation-delay:calc(.3s + var(--i) * .75s)}
 @keyframes word-in2{to{opacity:1;transform:none;filter:none}}
-.hero--center .hero__text{animation-delay:3s}
-.hero--center .hero__cta{animation-delay:3.25s}
-@media (prefers-reduced-motion:reduce){.hero__logo,.hero__line span{opacity:1;transform:none;filter:none;animation:none}}
-html.a-motion .hero__logo,html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
+.hero--center .hero__text{animation-delay:2.6s}
+.hero--center .hero__cta{animation-delay:2.85s}
+@media (prefers-reduced-motion:reduce){.hero__line span{opacity:1;transform:none;filter:none;animation:none}}
+html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
 
 /* variant b: dusk photo, deeper overlay */
 .hv-b .hero__img{object-position:50% 45%}

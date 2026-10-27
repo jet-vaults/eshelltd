@@ -271,7 +271,6 @@ function homeHero(lang, v, label = "") {
   ${label ? `<span class="hv-label">${label}</span>` : ""}
   ${bg}
   <div class="wrap hero__in">
-    <img class="hero__logo" src="/assets/brand/${light ? "logo" : "logo-white"}.webp" width="728" height="120" alt="">
     <h1 class="hero__line" id="hero-h${label ? "-" + v : ""}">${words}</h1>
     <p class="hero__text">${c.heroText}</p>
     <div class="hero__cta"><a class="btn ${light ? "" : "btn--light"}" href="${href(lang, routes.projects)}">${c.cta1}${ARROW}</a><a class="btn ${light ? "btn--line" : "btn--ghost-light"}" href="${href(lang, routes.renewal)}">${c.cta2}</a></div>

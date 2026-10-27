@@ -21,7 +21,7 @@ const L = (lang) => (o) => (o && typeof o === "object" && lang in o ? o[lang] : 
 const href = (lang, path) => (lang === "en" ? "/en" + path : path);
 const projPath = (p) => `${routes.projects}${p.slug}/`;
 const citySlug = (p) => p.city.en.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, "");
-const minCss = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").replace(/\s*([{}:;,>+~])\s*/g, "$1").replace(/;}/g, "}").trim();
+const minCss = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").replace(/\s*([{}:;,>~])\s*/g, "$1").replace(/;}/g, "}").trim();
 const hash = (s) => createHash("sha1").update(s).digest("hex").slice(0, 10);
 
 const ARROW = `<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>`;
@@ -247,20 +247,52 @@ function cityIndex(lang) {
   return [...m.entries()].sort((a, b) => b[1].n - a[1].n || a[1].name.localeCompare(b[1].name, lang));
 }
 
+// Home hero. Five background treatments; HOME_HERO picks the live one,
+// /hero-options/ (noindex, unlinked) shows all five for the client to choose.
+const HOME_HERO = "a";
+const HERO_VARIANTS = {
+  a: { name: "תמונה בהירה עם שכבת כחול רכה", img: "neot-navon/03" },
+  b: { name: "תמונת ערב דרמטית", img: "neot-navon/01" },
+  c: { name: "מצגת פרויקטים מתחלפת", imgs: ["neot-navon/03", "elad-center/02", "kava-tiberias/00", "rova-alonim-villas/01"] },
+  d: { name: "רקע בהיר עם פנורמה", img: "elad-center/03" },
+  e: { name: "כחול המותג עם שכבות הלוגו", img: null },
+};
+function homeHero(lang, v, label = "") {
+  const c = pages.home[lang];
+  const V = HERO_VARIANTS[v];
+  const sizes = "(orientation:portrait) 130vh, 100vw";
+  const light = v === "d";
+  const words = c.heroLines.map((l, i) => `<span style="--i:${i}">${l}</span>`).join(" ");
+  let bg = "";
+  if (v === "c") bg = `<div class="hero__slides">${V.imgs.map((k, i) => pic(k, { alt: "", sizes, cls: "hero__img", eager: i === 0 }).replace("<picture>", `<picture style="--s:${i}">`)).join("")}</div>`;
+  else if (V.img && !light) bg = pic(V.img, { alt: "", sizes, cls: "hero__img", eager: true });
+  else if (v === "e") bg = `<div class="hero__layers" aria-hidden="true"><i></i><i></i><i></i></div>`;
+  return `<section class="hero hero--center hv-${v}" aria-labelledby="hero-h${label ? "-" + v : ""}">
+  ${label ? `<span class="hv-label">${label}</span>` : ""}
+  ${bg}
+  <div class="wrap hero__in">
+    <img class="hero__logo" src="/assets/brand/${light ? "logo" : "logo-white"}.webp" width="728" height="120" alt="">
+    <h1 class="hero__line" id="hero-h${label ? "-" + v : ""}">${words}</h1>
+    <p class="hero__text">${c.heroText}</p>
+    <div class="hero__cta"><a class="btn ${light ? "" : "btn--light"}" href="${href(lang, routes.projects)}">${c.cta1}${ARROW}</a><a class="btn ${light ? "btn--line" : "btn--ghost-light"}" href="${href(lang, routes.renewal)}">${c.cta2}</a></div>
+  </div>
+  ${light ? `<div class="wrap hero__pano">${pic(V.img, { alt: "", sizes: "(max-width:1400px) 100vw, 1320px", eager: true })}</div>` : ""}
+</section>`;
+}
+function heroOptions() {
+  const lang = "he";
+  const body = Object.keys(HERO_VARIANTS).map((k, i) => homeHero(lang, k, `אפשרות ${i + 1} - ${HERO_VARIANTS[k].name}`)).join("\n<div class=\"hv-gap\"></div>\n");
+  return layout(lang, { path: "/hero-options/", title: "אפשרויות רקע לעמוד הבית | אשל הירדן", description: "השוואת רקעים לעמוד הבית", body })
+    .replace('<link rel="canonical"', '<meta name="robots" content="noindex, nofollow"><link rel="canonical"');
+}
+
 function home(lang) {
   const c = pages.home[lang], u = ui[lang], t = L(lang);
-  const heroKey = "neot-navon/03";
+  const heroKey = HERO_VARIANTS[HOME_HERO].img || "neot-navon/03";
   const heroSizes = "(orientation:portrait) 130vh, 100vw";
   const featured = ["neot-navon-haifa", "kava-tiberias", "haparsa-rechasim", "elad-center", "ahuzat-yaar-nofit", "nofim-maalot"].map((s) => projects.find((p) => p.slug === s));
   const body = `
-<section class="hero hero--center" aria-labelledby="hero-h">
-  ${pic(heroKey, { alt: lang === "he" ? "נאות נבון, חיפה - הדמיה" : "Neot Navon, Haifa - rendering", sizes: heroSizes, cls: "hero__img", eager: true })}
-  <div class="wrap hero__in">
-    <h1 class="hero__line" id="hero-h">${c.heroLines.map((l, i) => `<span style="--i:${i}">${l}</span>`).join(" ")}</h1>
-    <p class="hero__text">${c.heroText}</p>
-    <div class="hero__cta"><a class="btn btn--light" href="${href(lang, routes.projects)}">${c.cta1}${ARROW}</a><a class="btn btn--ghost-light" href="${href(lang, routes.renewal)}">${c.cta2}</a></div>
-  </div>
-</section>
+${homeHero(lang, HOME_HERO)}
 
 <section aria-label="${lang === "he" ? "החברה במספרים" : "The company in numbers"}">
   <div class="wrap"><div class="scale">${c.scale.map((s) => `<div><span class="scale__v num">${s.value}</span><span class="scale__l">${s.label}</span></div>`).join("")}</div></div>
@@ -609,6 +641,7 @@ for (const lang of LANGS) {
   }
 }
 write("/404.html", notFound());
+write("/hero-options/", heroOptions());
 
 // sitemap with hreflang alternates
 const today = new Date().toISOString().slice(0, 10);
@@ -617,7 +650,12 @@ writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 ${sitemapUrls.flatMap((p) => LANGS.map((l) => `<url><loc>${DOMAIN}${href(l, p)}</loc><lastmod>${today}</lastmod>${LANGS.map((a) => `<xhtml:link rel="alternate" hreflang="${a}" href="${DOMAIN}${href(a, p)}"/>`).join("")}<xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}${p}"/></url>`)).join("\n")}
 </urlset>
 `);
-writeFileSync(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${DOMAIN}/sitemap.xml\n`);
+writeFileSync(join(OUT, "robots.txt"), `User-agent: *
+Allow: /
+Disallow: /hero-options/
+
+Sitemap: ${DOMAIN}/sitemap.xml
+`);
 
 // Cloudflare Pages headers: preview hosts are never indexed; production is.
 writeFileSync(join(OUT, "_headers"), `/*

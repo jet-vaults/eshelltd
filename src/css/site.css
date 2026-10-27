@@ -689,3 +689,50 @@ html.a-motion .hero__line span,html.a-motion .hero--center .hero__text,html.a-mo
 .ur__text{padding:clamp(8px,2vw,28px) clamp(8px,2vw,32px)}
 .ur__item dl{border-block-start:1px solid #dfe3ea}
 @media (max-width:900px){.ur__text{padding:20px 8px 12px}}
+
+/* ===== home hero v2: shorter, logo, strictly sequential words ===== */
+.hero.hero--center{min-block-size:clamp(500px,74svh,760px)}
+.hero__logo{inline-size:clamp(170px,16vw,240px);block-size:auto;margin-block-end:clamp(18px,2.4vw,30px);opacity:0;animation:word-in .8s var(--ease) .1s forwards}
+.hero__line span{opacity:0;transform:translateY(.4em);filter:blur(6px);animation:word-in2 .75s var(--ease) forwards;animation-delay:calc(.7s + var(--i) * .75s)}
+@keyframes word-in2{to{opacity:1;transform:none;filter:none}}
+.hero--center .hero__text{animation-delay:3s}
+.hero--center .hero__cta{animation-delay:3.25s}
+@media (prefers-reduced-motion:reduce){.hero__logo,.hero__line span{opacity:1;transform:none;filter:none;animation:none}}
+html.a-motion .hero__logo,html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
+
+/* variant b: dusk photo, deeper overlay */
+.hv-b .hero__img{object-position:50% 45%}
+.hv-b::after{background:linear-gradient(to top,rgba(6,13,28,.85),rgba(6,13,28,.45) 55%,rgba(6,13,28,.35))}
+
+/* variant c: crossfading project slideshow with slow zoom */
+.hero__slides{position:absolute;inset:0}
+.hero__slides picture{position:absolute;inset:0;opacity:0;animation:slide 24s linear infinite;animation-delay:calc(var(--s) * 6s)}
+.hero__slides picture:first-child{opacity:1}
+.hero__slides img{animation:kb 24s linear infinite;animation-delay:calc(var(--s) * 6s)}
+@keyframes slide{0%{opacity:0}4%{opacity:1}25%{opacity:1}29%{opacity:0}100%{opacity:0}}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){.hero__slides picture,.hero__slides img{animation:none}.hero__slides picture:not(:first-child){display:none}}
+
+/* variant d: light off-white with a panorama band */
+.hv-d{background:#f4f6f9;color:var(--ink);min-block-size:0!important;align-content:start}
+.hv-d::after{display:none}
+.hv-d .hero__in{padding-block:clamp(48px,6vw,80px) clamp(28px,3vw,40px)}
+.hv-d .hero__line{color:var(--navy)}
+.hv-d .hero__text{color:var(--text)}
+.hero__pano{position:relative;z-index:2;padding-block-end:clamp(24px,3vw,40px)}
+.hero__pano picture,.hero__pano img{inline-size:100%;block-size:clamp(220px,26vw,380px);object-fit:cover;border-radius:28px}
+
+/* variant e: brand navy with the logo's three layers */
+.hv-e{background:radial-gradient(ellipse at 70% 20%,#1b3a6b 0%,var(--navy) 45%,var(--navy-3) 100%)}
+.hv-e::after{display:none}
+.hero__layers{position:absolute;inset:0;display:grid;align-content:center;gap:clamp(14px,1.8vw,26px);transform:skewY(-8deg);opacity:.5}
+.hero__layers i{display:block;block-size:clamp(46px,7vw,110px);border-radius:999px;margin-inline:-10%}
+.hero__layers i:nth-child(1){background:linear-gradient(90deg,transparent,rgba(152,216,248,.35),transparent)}
+.hero__layers i:nth-child(2){background:linear-gradient(90deg,transparent,rgba(64,112,184,.55),transparent);margin-inline-start:10%}
+.hero__layers i:nth-child(3){background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);margin-inline-start:22%}
+
+/* options page */
+.hv-label{position:absolute;z-index:5;inset-block-start:18px;inset-inline-start:18px;padding:8px 14px;border-radius:999px;background:#fff;color:var(--navy);font-weight:600;font-size:15px;box-shadow:0 6px 20px rgba(10,23,48,.25)}
+.hv-gap{block-size:40px;background:#fff}
+
+.hero .hero__pano picture{position:static;inset:auto}

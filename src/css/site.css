@@ -783,3 +783,11 @@ html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
 .figs dt{margin-inline:auto}
 .figs__row>div{flex-direction:column}
 .figs__row dd{order:-1}
+
+/* inner heroes: slightly darker overlay for text legibility */
+.ihero::after{background:linear-gradient(to top,rgba(6,13,28,.9) 0%,rgba(6,13,28,.62) 45%,rgba(6,13,28,.3) 80%)}
+[dir=rtl] .ihero::before,[dir=ltr] .ihero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none}
+[dir=rtl] .ihero::before{background:linear-gradient(to left,rgba(6,13,28,.35),rgba(6,13,28,0) 60%)}
+[dir=ltr] .ihero::before{background:linear-gradient(to right,rgba(6,13,28,.35),rgba(6,13,28,0) 60%)}
+.ihero--plain::before{display:none}
+.ihero h1,.ihero__lead{text-shadow:0 2px 18px rgba(0,0,0,.35)}

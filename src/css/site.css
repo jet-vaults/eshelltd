@@ -776,3 +776,10 @@ html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
 
 /* header: nav centered between logo and utilities */
 @media (min-width:1081px){.hdr__in{display:grid;grid-template-columns:1fr auto 1fr;gap:28px}.nav{margin-inline-start:0;justify-self:center}.hdr__util{justify-self:end}}
+
+/* figures band centered */
+.figs__row>div{align-items:center;text-align:center;justify-content:flex-start}
+.figs__row>div:first-child{padding-inline-start:clamp(18px,2.2vw,32px)}
+.figs dt{margin-inline:auto}
+.figs__row>div{flex-direction:column}
+.figs__row dd{order:-1}

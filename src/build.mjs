@@ -455,7 +455,7 @@ const BENEFIT_GROUPS = {
 
 function renewalPage(lang) {
   const c = pages.renewal[lang], u = ui[lang], t = L(lang);
-  const hero = pageHero(lang, { img: "ur-hero/00", title: c.h1, lead: c.lead, trail: [[u.nav.renewal, null]], size: "s", caption: (lang === "he" ? "התחדשות עירונית, נהריה. " : "Urban renewal, Nahariya. ") + u.render });
+  const hero = pageHero(lang, { img: "ur-hero2/00", title: c.h1, lead: c.lead, trail: [[u.nav.renewal, null]], size: "s", caption: (lang === "he" ? "התחדשות עירונית. " : "Urban renewal. ") + u.render });
   const body = `
 ${hero.html}
 <section class="figs" aria-label="${c.whyTitle}"><div class="wrap"><dl class="figs__row">${c.why.map((w) => `<div><dt>${w.label}</dt><dd class="num">${w.value}</dd></div>`).join("")}</dl></div></section>

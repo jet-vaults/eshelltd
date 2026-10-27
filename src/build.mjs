@@ -337,7 +337,7 @@ function pageHero(lang, { img, title, lead = "", trail, size = "l", caption = ""
 
 function projectsHub(lang) {
   const c = pages.projects[lang], u = ui[lang], t = L(lang);
-  const hero = pageHero(lang, { img: "kava-tiberias/02", title: c.h1, lead: c.lead, trail: [[c.h1, null]], size: "hub", caption: (lang === "he" ? "KAVA, טבריה. " : "KAVA, Tiberias. ") + u.render });
+  const hero = pageHero(lang, { img: "rova-alonim-villas/01", title: c.h1, lead: c.lead, trail: [[c.h1, null]], size: "hub", caption: (lang === "he" ? "רובע אלונים, מגדל העמק. " : "Rova Alonim, Migdal HaEmek. ") + u.render });
   const order = [...byStatus("marketing"), ...byStatus("planning"), ...byStatus("occupied")];
   const body = `
 ${hero.html}
@@ -365,16 +365,16 @@ ${contactBand(lang, pages.home[lang].contactTitle, "")}`;
 function projectPage(lang, p) {
   const u = ui[lang], t = L(lang);
   const cr = crumbs(lang, [[pages.projects[lang].h1, href(lang, routes.projects)], [t(p.name), null]]);
-  const heroImg = p.images[0];
+  const heroImg = p.images.length ? p.images.reduce((a, k) => (IMG[k].w > IMG[a].w ? k : a), p.images[0]) : undefined;
   const alt = (i) => `${t(p.name)}, ${t(p.city)} - ${u.render}${i ? " " + (i + 1) : ""}`;
   const related = [...projects.filter((x) => x.slug !== p.slug && x.status === p.status), ...projects.filter((x) => x.slug !== p.slug && x.status !== p.status)].slice(0, 3);
   const mapEmbed = "https://maps.google.com/maps?q=" + encodeURIComponent(p.map) + "&t=m&z=14&output=embed&hl=" + lang;
   const mapUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.map);
-  const gallery = p.images.slice(1);
+  const gallery = p.images.filter((k) => k !== heroImg);
   const tel = p.phone ? p.phone.replace(/[^0-9*+]/g, "") : "";
   const body = `
-<section class="ihero ihero--project${heroImg ? "" : " ihero--plain"}" aria-labelledby="page-h">
-  ${heroImg ? pic(heroImg, { alt: alt(0), sizes: "100vw", cls: "ihero__img", eager: true }) : ""}
+<section class="ihero ihero--project ihero--framed${heroImg ? "" : " ihero--plain"}" aria-labelledby="page-h">
+  ${heroImg ? pic(heroImg, { alt: alt(0), sizes: "(max-width:1520px) 100vw, 1480px", cls: "ihero__img", eager: true }) : ""}
   <div class="wrap ihero__in ihero__in--split">
     <div>
       ${cr.html.replace('class="crumbs"', 'class="crumbs crumbs--light"')}
@@ -426,7 +426,7 @@ ${p.video ? `<section class="sec" aria-labelledby="vid-h"><div class="wrap"><div
 </section>`;
   const ld = { "@context": "https://schema.org", "@type": "Place", name: t(p.name), description: t(p.summary), address: { "@type": "PostalAddress", addressLocality: t(p.city), addressCountry: "IL" }, ...(heroImg ? { image: DOMAIN + largest(heroImg) } : {}), url: DOMAIN + href(lang, projPath(p)) };
   const title = `${t(p.name)}, ${t(p.city)} | ${company.name[lang]}`;
-  return layout(lang, { path: projPath(p), nav: "projects", title, description: t(p.summary), body, preload: heroImg ? preloadImg(heroImg, "100vw") : "", ld: [cr.ld, ld], og: `/og/${p.slug}.jpg` });
+  return layout(lang, { path: projPath(p), nav: "projects", title, description: t(p.summary), body, preload: heroImg ? preloadImg(heroImg, "(max-width:1520px) 100vw, 1480px") : "", ld: [cr.ld, ld], og: `/og/${p.slug}.jpg` });
 }
 
 const BENEFIT_GROUPS = {
@@ -464,8 +464,8 @@ ${hero.html}
 
 function aboutPage(lang) {
   const c = pages.about[lang], u = ui[lang], h = pages.home[lang];
-  const cap = lang === "he" ? "השכונה הלבנה, כרמיאל" : "The White Neighbourhood, Karmiel";
-  const hero = pageHero(lang, { img: "white-neighborhood-karmiel/00", title: c.h1, lead: c.lead, trail: [[u.nav.about, null]], size: "l", caption: cap });
+  const cap = lang === "he" ? "נאות נבון, חיפה. הדמיה" : "Neot Navon, Haifa. Rendering";
+  const hero = pageHero(lang, { img: "neot-navon/02", title: c.h1, lead: c.lead, trail: [[u.nav.about, null]], size: "l", caption: cap });
   const body = `
 ${hero.html}
 <section class="figs" aria-label="${c.milestonesTitle}"><div class="wrap"><dl class="figs__row">${c.milestones.map((m) => `<div><dt>${m.label}</dt><dd class="num${m.value.length > 9 ? " long" : ""}">${m.value}</dd></div>`).join("")}</dl></div></section>
@@ -490,7 +490,7 @@ ${hero.html}
 
 function residentsPage(lang) {
   const c = pages.residents[lang], u = ui[lang], t = L(lang);
-  const hero = pageHero(lang, { img: "lev-hapisga-karmiel/00", title: c.h1, lead: c.lead, trail: [[u.residents, null]], size: "s", caption: (lang === "he" ? "לב הפסגה, כרמיאל" : "Lev HaPisga, Karmiel") });
+  const hero = pageHero(lang, { img: "terasa-karmiel/00", title: c.h1, lead: c.lead, trail: [[u.residents, null]], size: "s", caption: (lang === "he" ? "טרסה, כרמיאל" : "Terasa, Karmiel") });
   const projOptions = [...byStatus("occupied"), ...byStatus("marketing")].map((p) => `${t(p.name)}, ${t(p.city)}`).concat(lang === "he" ? ["אחר"] : ["Other"]);
   const body = `
 ${hero.html}
@@ -503,7 +503,7 @@ ${hero.html}
 
 function contactPage(lang) {
   const c = pages.contact[lang], u = ui[lang], t = L(lang);
-  const hero = pageHero(lang, { img: "neot-navon/07", title: c.h1, lead: c.lead, trail: [[u.nav.contact, null]], size: "s", caption: (lang === "he" ? "נאות נבון, חיפה. " : "Neot Navon, Haifa. ") + u.render });
+  const hero = pageHero(lang, { img: "neot-navon/04", title: c.h1, lead: c.lead, trail: [[u.nav.contact, null]], size: "s", caption: (lang === "he" ? "נאות נבון, חיפה. " : "Neot Navon, Haifa. ") + u.render });
   const body = `
 ${hero.html}
 <section class="sec"><div class="wrap inq inq--light">

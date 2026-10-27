@@ -11,7 +11,7 @@ Usage: python tools/images.py normalize <crawl_img_dir>
 """
 import json, os, sys, glob
 from concurrent.futures import ProcessPoolExecutor
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src", "images")
@@ -42,7 +42,7 @@ def render(path):
     widths = sorted(set(widths))
     for w in widths:
         h = round(h0 * w / w0)
-        r = im if w == w0 else im.resize((w, h), Image.LANCZOS)
+        r = im if w == w0 else im.resize((w, h), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=0.8, percent=45, threshold=2))
         base = os.path.join(OUT, slug, f"{name}-{w}")
         if not os.path.exists(base + ".avif"):
             r.save(base + ".avif", "AVIF", quality=64 if w >= 1280 else 54, speed=6)

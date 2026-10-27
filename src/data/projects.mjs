@@ -461,7 +461,7 @@ export const projects = [
     ],
     partners: { he: "בשותפות עם ריביירה צרפת ישראל בע\"מ", en: "With Riviera France Israel Ltd." },
     map: "קרית אתא",
-    images: [],
+    images: ["kiryat-ata-north/00"],
   },
 
   // ------------------------------------------------------------ occupied

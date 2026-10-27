@@ -791,3 +791,11 @@ html.a-motion .hero__line span{opacity:1;transform:none;filter:none}
 [dir=ltr] .ihero::before{background:linear-gradient(to right,rgba(6,13,28,.35),rgba(6,13,28,0) 60%)}
 .ihero--plain::before{display:none}
 .ihero h1,.ihero__lead{text-shadow:0 2px 18px rgba(0,0,0,.35)}
+
+/* renewal "our way": icons */
+.way__icon{display:grid;place-items:center;inline-size:64px;block-size:64px;border-radius:18px;background:rgba(152,216,248,.12);border:1px solid rgba(152,216,248,.28);color:var(--sky);margin-block-end:22px}
+.trio li:nth-child(2) .way__icon{background:rgba(64,112,184,.18);border-color:rgba(64,112,184,.45);color:#8fb3ec}
+.trio li:nth-child(3) .way__icon{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.28);color:#fff}
+.way__ico{inline-size:34px;block-size:34px}
+.way__icon{inline-size:76px;block-size:76px;border-radius:20px}
+.way__ico{inline-size:44px;block-size:44px}

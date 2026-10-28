@@ -4,7 +4,7 @@ const CLOSED = `<!doctype html><html lang="he" dir="rtl"><meta charset="utf-8"><
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
-    const page = !/.[a-z0-9]{2,5}$/i.test(url.pathname) || url.pathname.endsWith(".html");
+    const page = !/[.][a-z0-9]{2,5}$/i.test(url.pathname) || url.pathname.endsWith(".html");
     if (page) {
       const cf = req.cf || {};
       console.log(JSON.stringify({ t: new Date().toISOString(), page: decodeURIComponent(url.pathname), country: cf.country, city: cf.city, region: cf.region, device: /Mobi/i.test(req.headers.get("user-agent") || "") ? "mobile" : "desktop", ref: req.headers.get("referer") || "" }));

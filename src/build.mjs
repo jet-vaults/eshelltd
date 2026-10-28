@@ -168,7 +168,7 @@ function footer(lang) {
         <li><a href="${company.social.youtube}" rel="noopener" target="_blank">YouTube</a></li></ul></div>
     </div>
     <div class="ftr__bot">
-      <p>© ${y} ${company.legalName[lang]}. ${f.rights}. ${f.renders}</p>
+      <p>© ${y} ${company.legalName[lang]}. ${f.rights}. ${f.renders}<br>${lang === "he" ? "זכויות העיצוב שמורות ל" : "Design rights reserved to "}<a href="https://einstein-web.co.il" target="_blank" rel="noopener">${lang === "he" ? "איינשטיין אתרים" : "Einstein Web"}</a></p>
       <nav aria-label="${lang === "he" ? "מידע משפטי" : "Legal"}">
         <a href="${href(lang, routes.accessibility)}">${pages.legal[lang] && u.a11y.statement}</a>
         <a href="${href(lang, routes.privacy)}">${privacy[lang].h1}</a>

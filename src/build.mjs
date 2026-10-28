@@ -8,6 +8,8 @@ import { fileURLToPath } from "node:url";
 import { company, routes, ui, pages, jobs, press, partners } from "./data/site.mjs";
 import { projects, renewal } from "./data/projects.mjs";
 import { privacy, accessibility } from "./data/legal.mjs";
+import { lockHead, lockBody, lockWorker } from "./lock.mjs";
+const LOCK = process.env.LOCK_UNTIL || "";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(ROOT, "wwwroot");
@@ -97,6 +99,7 @@ ${fonts.map((f) => `<link rel="preload" href="/assets/fonts/plex-hebrew-${f}.wof
 ${o.preload || ""}
 <script>document.documentElement.classList.add("js");try{var p=JSON.parse(localStorage.getItem("eh-a11y"))||{};for(var k in p)if(p[k])document.documentElement.classList.add("a-"+k)}catch(e){}</script>
 <style>${css}</style>
+${LOCK ? lockHead(LOCK) : ""}
 <script type="application/ld+json">${JSON.stringify(ld.length === 1 ? ld[0] : { "@context": "https://schema.org", "@graph": ld.map(({ ["@context"]: _, ...x }) => x) })}</script>
 </head>
 <body>
@@ -136,6 +139,7 @@ ${footer(lang)}
 </div>
 <script>window.EH_FORMS=${JSON.stringify(company.forms)}</script>
 <script src="/assets/${jsName}" defer></script>
+${LOCK ? lockBody() : ""}
 </body>
 </html>`;
 }
@@ -646,6 +650,8 @@ writeFileSync(join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 ${sitemapUrls.flatMap((p) => LANGS.map((l) => `<url><loc>${DOMAIN}${href(l, p)}</loc><lastmod>${today}</lastmod>${LANGS.map((a) => `<xhtml:link rel="alternate" hreflang="${a}" href="${DOMAIN}${href(a, p)}"/>`).join("")}<xhtml:link rel="alternate" hreflang="x-default" href="${DOMAIN}${p}"/></url>`)).join("\n")}
 </urlset>
 `);
+rmSync(join(OUT, "_worker.js"), { force: true });
+if (LOCK) writeFileSync(join(OUT, "_worker.js"), lockWorker(LOCK));
 writeFileSync(join(OUT, "robots.txt"), `User-agent: *
 Allow: /
 
